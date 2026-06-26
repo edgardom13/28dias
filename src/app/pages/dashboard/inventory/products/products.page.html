@@ -1,0 +1,376 @@
+<div class="page-container">
+  <div class="page-content">
+    
+    <!-- Header de la página -->
+    <div class="page-header">
+      <div class="page-header-content">
+        <div>
+          <h1 class="page-title">Productos</h1>
+          <p class="page-subtitle">Gestiona tu inventario de productos</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn-secondary" (click)="exportProducts()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            Exportar
+          </button>
+          <button class="btn-primary" (click)="openCreateModal()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Nuevo Producto
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon purple">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Total Productos</p>
+          <p class="stat-value">{{ products.length }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">En Stock</p>
+          <p class="stat-value">{{ inStockCount }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon yellow">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Stock Bajo</p>
+          <p class="stat-value">{{ lowStockCount }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon red">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Sin Stock</p>
+          <p class="stat-value">{{ outOfStockCount }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros y Búsqueda -->
+    <div class="filters-card">
+      <div class="filters-row">
+        <div class="search-box">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="filterProducts()"
+            placeholder="Buscar productos por nombre, SKU o código..."
+            class="search-input">
+        </div>
+
+        <div class="filters-actions">
+          <select [(ngModel)]="filterCategory" (ngModelChange)="filterProducts()" class="filter-select">
+            <option value="">Todas las categorías</option>
+            <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+          </select>
+
+          <select [(ngModel)]="filterStock" (ngModelChange)="filterProducts()" class="filter-select">
+            <option value="">Todo el stock</option>
+            <option value="in-stock">En stock</option>
+            <option value="low-stock">Stock bajo</option>
+            <option value="out-of-stock">Sin stock</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Productos -->
+    <div class="products-table-container" *ngIf="filteredProducts.length > 0">
+      <table class="products-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>SKU</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th class="text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of filteredProducts">
+            <td>
+              <div class="table-product">
+                <div class="table-product-image">
+                  <img *ngIf="product.image" [src]="product.image" [alt]="product.name">
+                  <div *ngIf="!product.image" class="table-product-placeholder">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="table-product-info">
+                  <p class="table-product-name">{{ product.name }}</p>
+                  <p class="table-product-description">
+                    {{ (product.description || '') | slice:0:50 }}
+                    {{ (product.description?.length || 0) > 50 ? '...' : '' }}
+                  </p>
+                </div>
+              </div>
+            </td>
+            <td><span class="table-sku">{{ product.sku }}</span></td>
+            <td><span class="table-category">{{ getCategoryName(product.category_id || '') }}</span></td>
+            <td>
+              <div class="table-price">
+                <span class="price-main">${{ product.price | number:'1.2-2' }}</span>
+                <span *ngIf="product.cost" class="price-cost">Costo: ${{ product.cost | number:'1.2-2' }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="table-stock">
+                <span class="stock-value">{{ product.stock }}</span>
+                <span class="stock-min">/ {{ product.min_stock }}</span>
+              </div>
+            </td>
+            <td>
+              <span
+                class="status-badge"
+                [class.in-stock]="product.stock > product.min_stock"
+                [class.low-stock]="product.stock <= product.min_stock && product.stock > 0"
+                [class.out-of-stock]="product.stock === 0">
+                {{ product.stock === 0 ? 'Sin stock' : product.stock <= product.min_stock ? 'Stock bajo' : 'En stock' }}
+              </span>
+            </td>
+            <td class="text-right">
+              <div class="table-actions">
+                <button class="btn-action edit" (click)="editProduct(product)" title="Editar">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </button>
+                <button class="btn-action delete" (click)="deleteProduct(product)" title="Eliminar">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredProducts.length === 0" class="empty-state">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+      </svg>
+      <h3>No se encontraron productos</h3>
+      <p>Intenta ajustar los filtros o crea un nuevo producto</p>
+      <button class="btn-primary" (click)="openCreateModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Crear Producto
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==========================================
+     MODALES - FUERA DEL PAGE-CONTAINER
+     ========================================== -->
+
+<!-- Modal Crear/Editar Producto -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content modal-compact" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editingProduct ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+      <button class="modal-close" (click)="closeModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <form (ngSubmit)="saveProduct()" class="modal-form">
+      <div class="modal-body">
+        <div class="form-grid-compact">
+          <ng-container *ngFor="let field of businessFields">
+            
+            <!-- Campo full-width -->
+            <div class="form-group" [class.full-width]="field.grid === 'full'" *ngIf="field.type !== 'file'">
+              <label>{{ field.label }} <span *ngIf="field.required">*</span></label>
+              
+              <!-- Select de categoría -->
+              <div *ngIf="field.key === 'category_id'" class="category-select-container">
+                <select [(ngModel)]="productForm.category_id" [name]="field.key" [attr.required]="field.required || null" class="form-input">
+                  <option value="">Seleccionar</option>
+                  <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+                </select>
+                <button type="button" class="btn-create-category" (click)="openCategoryModal()">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                </button>
+              </div>
+              
+              <!-- Select normal -->
+              <select *ngIf="field.type === 'select' && field.key !== 'category_id'" 
+                      [(ngModel)]="productForm[field.key]" 
+                      [name]="field.key" 
+                      [attr.required]="field.required || null"
+                      class="form-input">
+                <option value="">Seleccionar</option>
+                <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
+              </select>
+              
+              <!-- Textarea -->
+              <textarea *ngIf="field.type === 'textarea'"
+                        [(ngModel)]="productForm[field.key]"
+                        [name]="field.key"
+                        class="form-input"
+                        rows="2"
+                        [placeholder]="field.placeholder || ''"></textarea>
+              
+              <!-- Boolean (checkbox) -->
+              <label *ngIf="field.type === 'boolean'" class="checkbox-label">
+                <input type="checkbox" 
+                       [(ngModel)]="productForm[field.key]" 
+                       [name]="field.key">
+                <span>Disponible</span>
+              </label>
+              
+              <!-- Array (checkboxes múltiples) -->
+              <div *ngIf="field.type === 'array'" class="checkbox-group">
+                <label *ngFor="let opt of field.options" class="checkbox-item">
+                  <input type="checkbox" 
+                         [checked]="isOptionSelected(field.key, opt)"
+                         (change)="toggleOption(field.key, opt)">
+                  <span>{{ opt }}</span>
+                </label>
+              </div>
+              
+              <!-- Input normal (text/number) -->
+              <input *ngIf="field.type === 'text' || field.type === 'number'"
+                     [type]="field.type"
+                     [(ngModel)]="productForm[field.key]"
+                     [name]="field.key"
+                     [attr.required]="field.required || null"
+                     class="form-input"
+                     [placeholder]="field.placeholder || ''"
+                     [step]="field.type === 'number' ? '0.01' : null"
+                     [min]="field.type === 'number' ? '0' : null">
+            </div>
+
+            <!-- Preview de imagen actual -->
+            <div class="form-group full-width" *ngIf="field.key === 'image' && editingProduct && productForm.image">
+              <label>Imagen actual</label>
+              <div class="image-preview-container">
+                <img [src]="productForm.image" class="current-image">
+                <button type="button" class="btn-remove-image" (click)="removeCurrentImage()" *ngIf="!selectedFile">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Input file -->
+            <div class="form-group full-width" *ngIf="field.key === 'image'">
+              <label>Imagen {{ selectedFile ? 'nueva' : '' }}</label>
+              <input type="file" (change)="onFileSelected($event)" class="form-input" accept="image/*">
+              <small class="text-muted" *ngIf="selectedFile">Archivo: {{ selectedFile.name }}</small>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          type="button" 
+          class="btn-secondary" 
+          (click)="closeModal()" 
+          [disabled]="isLoading">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn-primary" 
+          [disabled]="isLoading">
+          {{ isLoading ? 'Guardando...' : (editingProduct ? 'Guardar' : 'Crear') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Categoría Compacto -->
+<div *ngIf="showCategoryModal" class="modal-overlay" (click)="closeCategoryModal()">
+  <div class="modal-content modal-compact modal-small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Nueva Categoría</h2>
+      <button class="modal-close" (click)="closeCategoryModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <form (ngSubmit)="saveCategory()" class="modal-form">
+      <div class="modal-body">
+        <div class="form-grid-compact">
+          <div class="form-group full-width">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="categoryForm.name" name="category_name" required class="form-input" placeholder="Ej: Ropa" autofocus>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Descripción</label>
+            <textarea [(ngModel)]="categoryForm.description" name="category_description" class="form-input" rows="2" placeholder="Descripción..."></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Color</label>
+            <div class="color-picker-compact">
+              <input type="color" [(ngModel)]="categoryForm.color" name="category_color" class="color-input">
+              <span class="color-value">{{ categoryForm.color }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeCategoryModal()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="isLoading">
+          {{ isLoading ? 'Creando...' : 'Crear' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

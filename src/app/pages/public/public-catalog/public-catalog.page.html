@@ -1,0 +1,355 @@
+<div class="public-catalog">
+  
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="catalog-loading">
+    <div class="loader"></div>
+    <p>Cargando catálogo...</p>
+  </div>
+
+  <!-- Not Found -->
+  <div *ngIf="notFound" class="catalog-not-found">
+    <div class="not-found-content">
+      <div class="not-found-icon">🔍</div>
+      <h1>Catálogo no encontrado</h1>
+      <p>El catálogo que buscas no existe o no está disponible</p>
+      <a href="/" class="btn-home">Ir al inicio</a>
+    </div>
+  </div>
+
+  <!-- Catalog Content -->
+  <div *ngIf="!isLoading && settings && !notFound" class="catalog-wrapper">
+    
+    <!-- ==========================================
+         HERO SECTION
+         ========================================== -->
+    <header class="catalog-hero">
+      <div class="hero-content">
+        <div class="hero-brand">
+          <div class="brand-logo" *ngIf="settings.store_logo_url">
+            <img [src]="settings.store_logo_url" [alt]="settings.store_name">
+          </div>
+          <div class="brand-logo placeholder" *ngIf="!settings.store_logo_url">
+            {{ (settings.store_name?.charAt(0) || 'T') | uppercase }}
+          </div>
+          <div class="brand-info">
+            <h1 class="brand-name">{{ settings.store_name }}</h1>
+            <p class="brand-tagline" *ngIf="settings.store_description">{{ settings.store_description }}</p>
+          </div>
+        </div>
+
+        <!-- Cart Toggle -->
+        <button 
+          *ngIf="settings.allow_cart && cart.length > 0"
+          class="cart-toggle"
+          (click)="showCart = !showCart">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+          <span class="cart-badge">{{ getCartCount() }}</span>
+        </button>
+      </div>
+
+      <!-- Hero Features -->
+      <div class="hero-features" *ngIf="settings.welcome_message">
+        <div class="feature-item">
+          <div class="feature-icon">✨</div>
+          <div class="feature-text">{{ settings.welcome_message }}</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==========================================
+         SEARCH & FILTERS
+         ========================================== -->
+    <div class="catalog-controls">
+      <div class="search-container">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Buscar productos..."
+          class="search-input">
+      </div>
+
+      <!-- Categories -->
+      <div class="categories-container" *ngIf="categories.length > 0">
+        <button 
+          class="category-pill"
+          [class.active]="selectedCategory === 'all'"
+          (click)="selectedCategory = 'all'; onFilterChange()">
+          Todos
+        </button>
+        <button 
+          *ngFor="let cat of categories"
+          class="category-pill"
+          [class.active]="selectedCategory === cat.id"
+          [style.--pill-color]="cat.color || '#667eea'"
+          (click)="selectedCategory = cat.id; onFilterChange()">
+          {{ cat.name }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         PRODUCTS GRID
+         ========================================== -->
+    <div class="products-section">
+      <div class="section-header">
+        <h2 class="section-title">Nuestra Colección</h2>
+        <div class="products-count">{{ filteredProducts.length }} productos</div>
+      </div>
+
+      <div class="products-grid" *ngIf="filteredProducts.length > 0">
+        <div 
+          *ngFor="let product of filteredProducts"
+          class="product-card"
+          [class.featured]="product.is_featured"
+          (click)="openProductDetail(product)">
+          
+          <!-- Product Image -->
+          <div class="product-image-wrapper">
+            <div class="product-image" *ngIf="product.image">
+              <img [src]="product.image" [alt]="product.name" loading="lazy">
+            </div>
+            <div class="product-image placeholder" *ngIf="!product.image">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            
+            <!-- Badges -->
+            <div class="product-badges">
+              <span class="badge featured" *ngIf="product.is_featured">⭐ Destacado</span>
+              <span class="badge new" *ngIf="product.stock > 0 && !product.is_featured">Nuevo</span>
+              <span class="badge out-of-stock" *ngIf="product.stock === 0">Agotado</span>
+            </div>
+
+            <!-- Quick Add Button -->
+            <button 
+              *ngIf="settings.allow_cart && product.stock > 0"
+              class="quick-add-btn"
+              (click)="$event.stopPropagation(); addToCart(product)">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Product Info -->
+          <div class="product-details">
+            <div class="product-category" *ngIf="product.category_name">
+              {{ product.category_name }}
+            </div>
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-description" *ngIf="product.final_description">
+              {{ product.final_description | slice:0:80 }}{{ product.final_description.length > 80 ? '...' : '' }}
+            </p>
+            
+            <div class="product-footer">
+              <div class="product-price-wrapper" *ngIf="settings.show_prices">
+                <span class="product-price">{{ formatCurrency(product.final_price) }}</span>
+                <span class="product-stock" [class.low]="product.stock <= 5 && product.stock > 0">
+                  {{ product.stock > 0 ? product.stock + ' disp.' : 'Sin stock' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredProducts.length === 0">
+        <div class="empty-icon">🔍</div>
+        <h3>No se encontraron productos</h3>
+        <p>Intenta con otros filtros o términos de búsqueda</p>
+        <button class="btn-clear-filters" (click)="clearFilters()">
+          Ver todos los productos
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         FOOTER
+         ========================================== -->
+    <footer class="catalog-footer">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>{{ settings.store_name }}</h4>
+          <p *ngIf="settings.whatsapp_number" class="footer-contact">
+            📱 {{ settings.whatsapp_number }}
+          </p>
+        </div>
+
+        <div class="footer-section" *ngIf="settings.instagram_url || settings.facebook_url">
+          <h4>Síguenos</h4>
+          <div class="social-links">
+            <a *ngIf="settings.instagram_url" [href]="'https://instagram.com/' + settings.instagram_url.replace('@', '')" target="_blank" class="social-link">
+              <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/>
+              </svg>
+            </a>
+            <a *ngIf="settings.facebook_url" [href]="settings.facebook_url" target="_blank" class="social-link">
+              <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h4>Información</h4>
+          <p class="footer-powered">
+            Powered by <strong>28dias</strong>
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ==========================================
+         WHATSAPP FLOATING BUTTON
+         ========================================== -->
+<button 
+  *ngIf="settings?.whatsapp_number"
+  class="whatsapp-float"
+  (click)="sendOrderWhatsApp()"
+  title="Contáctanos por WhatsApp">
+  <svg fill="currentColor" viewBox="0 0 24 24">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+</button>
+
+    <!-- ==========================================
+         PRODUCT DETAIL MODAL
+         ========================================== -->
+    <div *ngIf="showProductDetail && selectedProduct" class="modal-overlay" (click)="closeProductDetail()">
+      <div class="modal-content product-detail-modal" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="closeProductDetail()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+
+        <div class="modal-body">
+          <div class="product-detail-image" *ngIf="selectedProduct.image">
+            <img [src]="selectedProduct.image" [alt]="selectedProduct.name">
+          </div>
+          <div class="product-detail-image placeholder" *ngIf="!selectedProduct.image">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+
+          <div class="product-detail-info">
+            <div class="detail-category" *ngIf="selectedProduct.category_name">
+              {{ selectedProduct.category_name }}
+            </div>
+            <h2>{{ selectedProduct.name }}</h2>
+            
+            <div class="detail-price" *ngIf="settings.show_prices">
+              {{ formatCurrency(selectedProduct.final_price) }}
+            </div>
+
+            <div class="detail-stock" [class.out]="selectedProduct.stock === 0">
+              <span *ngIf="selectedProduct.stock > 0">✅ {{ selectedProduct.stock }} disponibles</span>
+              <span *ngIf="selectedProduct.stock === 0">❌ Sin stock disponible</span>
+            </div>
+
+            <p class="detail-description" *ngIf="selectedProduct.final_description">
+              {{ selectedProduct.final_description }}
+            </p>
+
+            <div class="detail-actions">
+              <button 
+                *ngIf="settings.allow_cart && selectedProduct.stock > 0"
+                class="btn-add-cart-large"
+                (click)="addToCart(selectedProduct); closeProductDetail()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                Agregar al carrito
+              </button>
+              <button 
+                *ngIf="settings.whatsapp_number"
+                class="btn-whatsapp-large"
+                (click)="sendDirectWhatsApp(selectedProduct)">
+                💬 Consultar por WhatsApp
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         CART SIDEBAR
+         ========================================== -->
+    <div *ngIf="showCart" class="cart-overlay" (click)="showCart = false">
+      <div class="cart-sidebar" (click)="$event.stopPropagation()">
+        <div class="cart-header">
+          <h3>🛒 Tu carrito</h3>
+          <button class="close-cart" (click)="showCart = false">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="cart-items" *ngIf="cart.length > 0">
+          <div *ngFor="let item of cart" class="cart-item">
+            <div class="cart-item-image" *ngIf="item.product.image">
+              <img [src]="item.product.image" [alt]="item.product.name">
+            </div>
+            <div class="cart-item-info">
+              <h4>{{ item.product.name }}</h4>
+              <p class="cart-item-price">{{ formatCurrency(item.product.final_price) }}</p>
+              <div class="quantity-controls">
+                <button (click)="updateCartQuantity(item.product.id, item.quantity - 1)">−</button>
+                <span>{{ item.quantity }}</span>
+                <button (click)="updateCartQuantity(item.product.id, item.quantity + 1)">+</button>
+              </div>
+            </div>
+            <div class="cart-item-subtotal">
+              {{ formatCurrency(item.product.final_price * item.quantity) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-empty" *ngIf="cart.length === 0">
+          <div class="empty-cart-icon">🛒</div>
+          <p>Tu carrito está vacío</p>
+          <p class="empty-cart-hint">Agrega productos para comenzar</p>
+        </div>
+
+        <!-- Reemplaza el cart-footer existente por esto -->
+<div class="cart-footer" *ngIf="cart.length > 0">
+  <div class="cart-total">
+    <span>Total:</span>
+    <strong>{{ formatCurrency(getCartTotal()) }}</strong>
+  </div>
+  
+  <!-- Botón WhatsApp siempre visible -->
+  <button 
+    *ngIf="settings?.whatsapp_number"
+    class="btn-order-whatsapp"
+    (click)="sendOrderWhatsApp()">
+    <svg fill="currentColor" viewBox="0 0 24 24" style="width: 1.25rem; height: 1.25rem;">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    </svg>
+    Enviar pedido por WhatsApp
+  </button>
+  
+  <!-- Botón alternativo si no hay número configurado -->
+  <div *ngIf="!settings?.whatsapp_number" class="no-whatsapp">
+    <p style="color: #6b7280; font-size: 0.875rem; text-align: center;">
+      💡 Agrega un número de WhatsApp en la configuración
+    </p>
+  </div>
+</div>
+      </div>
+    </div>
+
+  </div>
+</div>

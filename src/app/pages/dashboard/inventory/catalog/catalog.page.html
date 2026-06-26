@@ -1,0 +1,658 @@
+<div class="page-container">
+  <div class="page-content">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <div class="page-header-content">
+        <div>
+          <h1 class="page-title">Mi Catálogo</h1>
+          <p class="page-subtitle">Gestiona tu catálogo público y compártelo con tus clientes</p>
+        </div>
+        <div class="header-actions" *ngIf="settings">
+          <button 
+            class="catalog-toggle" 
+            [class.active]="settings.is_active"
+            (click)="toggleCatalog()"
+            [disabled]="isSaving">
+            <span class="toggle-switch">
+              <span class="toggle-slider"></span>
+            </span>
+            <span class="toggle-label">
+              {{ settings.is_active ? 'Catálogo Activo' : 'Catálogo Inactivo' }}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando catálogo...</p>
+    </div>
+
+    <div *ngIf="!isLoading && settings" class="catalog-content">
+      
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Productos</p>
+            <p class="stat-value">{{ products.length }}</p>
+            <p class="stat-subtitle">{{ getVisibleCount() }} visibles</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon yellow">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Destacados</p>
+            <p class="stat-value">{{ getFeaturedCount() }}</p>
+            <p class="stat-subtitle">Productos destacados</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Visitas</p>
+            <p class="stat-value">{{ settings.total_views || 0 }}</p>
+            <p class="stat-subtitle">Total de vistas</p>
+          </div>
+        </div>
+
+        <div class="stat-card share-card">
+          <div class="stat-icon green">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Compartir Catálogo</p>
+            <div class="share-buttons">
+              <button class="btn-share whatsapp" (click)="shareWhatsApp()" title="Compartir por WhatsApp">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                WhatsApp
+              </button>
+              <button class="btn-share copy" (click)="copyCatalogLink()" [class.copied]="linkCopied">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                </svg>
+                {{ linkCopied ? '¡Copiado!' : 'Copiar Link' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Catalog URL Card -->
+      <div class="url-card" *ngIf="settings.slug">
+        <div class="url-info">
+          <span class="url-label">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+            Link de tu catálogo:
+          </span>
+          <div class="url-display">
+            <code>{{ catalogService.getCatalogUrl(settings.slug) }}</code>
+          </div>
+        </div>
+        <button class="btn-preview" (click)="openPublicCatalog()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+          Ver Catálogo
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button 
+          class="tab" 
+          [class.active]="activeTab === 'products'"
+          (click)="activeTab = 'products'">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          Productos
+        </button>
+        <button 
+          class="tab" 
+          [class.active]="activeTab === 'settings'"
+          (click)="activeTab = 'settings'">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Configuración
+        </button>
+      </div>
+
+      <!-- TAB: PRODUCTOS -->
+      <div *ngIf="activeTab === 'products'" class="tab-content">
+        
+        <!-- ✅ NUEVO: Sección de sincronización cuando no hay productos -->
+        <div class="sync-section" *ngIf="products.length === 0 && !isSyncing">
+          <div class="sync-card">
+            <div class="sync-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </div>
+            <div class="sync-info">
+              <h3>{{ hasInventoryProducts ? 'Sincroniza tus productos' : 'No hay productos en tu inventario' }}</h3>
+              <p>{{ hasInventoryProducts ? 'Agrega los productos de tu inventario al catálogo para empezar a gestionarlos' : 'Primero debes crear productos en la sección de Inventario' }}</p>
+            </div>
+            <button 
+              *ngIf="hasInventoryProducts"
+              class="btn-sync" 
+              (click)="syncProducts()" 
+              [disabled]="isSyncing">
+              <ion-spinner *ngIf="isSyncing" name="crescent" class="btn-spinner"></ion-spinner>
+              <svg *ngIf="!isSyncing" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              {{ isSyncing ? 'Sincronizando...' : 'Sincronizar Productos' }}
+            </button>
+            <button 
+              *ngIf="!hasInventoryProducts"
+              class="btn-sync" 
+              (click)="goToInventory()">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+              </svg>
+              Ir a Inventario
+            </button>
+          </div>
+        </div>
+
+        <!-- ✅ NUEVO: Controls Bar cuando hay productos -->
+        <div class="controls-bar" *ngIf="products.length > 0">
+          <div class="controls-info">
+            <span class="badge-count">
+              {{ getVisibleCount() }} de {{ products.length }} visibles
+            </span>
+          </div>
+          <div class="controls-actions">
+            <button class="btn-secondary" (click)="showAllProducts()" [disabled]="allProductsVisible()">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              Mostrar Todos
+            </button>
+            <button class="btn-secondary" (click)="hideAllProducts()" [disabled]="getVisibleCount() === 0">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+              </svg>
+              Ocultar Todos
+            </button>
+            <!-- <button class="btn-primary" (click)="openProductSelector()">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              Seleccionar Productos
+            </button> -->
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-card" *ngIf="products.length > 0">
+          <div class="filters-row">
+            <div class="search-box">
+              <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input 
+                type="text" 
+                [(ngModel)]="searchQuery"
+                (ngModelChange)="onFilterChange()"
+                placeholder="Buscar producto..."
+                class="search-input">
+            </div>
+
+            <select [(ngModel)]="categoryFilter" (ngModelChange)="onFilterChange()" class="filter-select">
+              <option value="all">Todas las categorías</option>
+              <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+            </select>
+
+            <select [(ngModel)]="visibilityFilter" (ngModelChange)="onFilterChange()" class="filter-select">
+              <option value="all">Todos</option>
+              <option value="visible">Visibles</option>
+              <option value="hidden">Ocultos</option>
+              <option value="featured">Destacados</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="catalog-products-grid" *ngIf="filteredProducts.length > 0">
+          <div 
+            *ngFor="let product of filteredProducts; let i = index" 
+            class="catalog-product-card"
+            [class.featured]="product.is_featured"
+            [class.hidden]="!product.is_visible">
+            
+            <!-- Badges -->
+            <div class="product-badges">
+              <span *ngIf="product.is_featured" class="badge featured">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                Destacado
+              </span>
+              <span *ngIf="!product.is_visible" class="badge hidden-badge">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                </svg>
+                Oculto
+              </span>
+              <span *ngIf="product.stock === 0" class="badge out-of-stock">Sin stock</span>
+            </div>
+
+            <!-- Image -->
+            <div class="product-image" [style.background]="product.image ? 'none' : 'linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%)'">
+              <img *ngIf="product.image" [src]="product.image" [alt]="product.name">
+              <svg *ngIf="!product.image" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </div>
+
+            <!-- Info -->
+            <div class="product-info">
+              <h3 class="product-name">{{ product.name }}</h3>
+              <p class="product-category" *ngIf="product.category_name">
+                <span class="category-dot" [style.background]="product.category_color || '#a855f7'"></span>
+                {{ product.category_name }}
+              </p>
+              <div class="product-price-stock">
+                <span class="product-price">{{ formatCurrency(product.final_price) }}</span>
+                <span class="product-stock">Stock: {{ product.stock }}</span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="product-actions">
+              <button 
+                class="action-btn visibility"
+                [class.active]="product.is_visible"
+                (click)="toggleVisibility(product)"
+                [title]="product.is_visible ? 'Ocultar del catálogo' : 'Mostrar en catálogo'">
+                <svg *ngIf="product.is_visible" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                <svg *ngIf="!product.is_visible" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                </svg>
+              </button>
+
+              <button 
+                class="action-btn featured"
+                [class.active]="product.is_featured"
+                (click)="toggleFeatured(product)"
+                title="Destacar producto">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+              </button>
+
+              <div class="order-buttons">
+                <button 
+                  class="action-btn order"
+                  (click)="moveProduct(product, 'up')"
+                  [disabled]="i === 0"
+                  title="Subir">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                  </svg>
+                </button>
+                <button 
+                  class="action-btn order"
+                  (click)="moveProduct(product, 'down')"
+                  [disabled]="i === filteredProducts.length - 1"
+                  title="Bajar">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State (cuando hay productos pero no coinciden con filtros) -->
+        <div *ngIf="filteredProducts.length === 0 && products.length > 0" class="empty-state">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+          </svg>
+          <h3>No se encontraron productos</h3>
+          <p>Intenta con otros filtros</p>
+        </div>
+      </div>
+
+      <!-- TAB: CONFIGURACIÓN -->
+      <div *ngIf="activeTab === 'settings'" class="tab-content">
+        <div class="settings-form">
+          
+          <!-- Información de la tienda -->
+          <div class="settings-section">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+              Información de la Tienda
+            </h3>
+            
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label>Nombre de la tienda</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="settings.store_name"
+                  class="form-input"
+                  placeholder="Mi Tienda">
+              </div>
+
+              <div class="form-group full-width">
+                <label>Descripción</label>
+                <textarea 
+                  [(ngModel)]="settings.store_description"
+                  class="form-input"
+                  rows="3"
+                  placeholder="Describe tu tienda..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Color principal</label>
+                <div class="color-picker-wrapper">
+                  <input 
+                    type="color" 
+                    [(ngModel)]="settings.primary_color"
+                    class="color-input">
+                  <input 
+                    type="text" 
+                    [(ngModel)]="settings.primary_color"
+                    class="form-input color-text"
+                    placeholder="#9333ea">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Moneda</label>
+                <select [(ngModel)]="settings.currency" class="form-input">
+                  <option value="MXN">MXN - Peso Mexicano</option>
+                  <option value="USD">USD - Dólar</option>
+                  <option value="COP">COP - Peso Colombiano</option>
+                  <option value="EUR">EUR - Euro</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contacto -->
+          <div class="settings-section">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+              Contacto y Redes
+            </h3>
+            
+            <div class="form-grid">
+              <div class="form-group">
+                <label>WhatsApp (con código de país)</label>
+                <input 
+                  type="tel" 
+                  [(ngModel)]="settings.whatsapp_number"
+                  class="form-input"
+                  placeholder="+52 555 123 4567">
+              </div>
+
+              <div class="form-group">
+                <label>Instagram</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="settings.instagram_url"
+                  class="form-input"
+                  placeholder="@mitienda">
+              </div>
+
+              <div class="form-group">
+                <label>Facebook</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="settings.facebook_url"
+                  class="form-input"
+                  placeholder="facebook.com/mitienda">
+              </div>
+
+              <div class="form-group">
+                <label>TikTok</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="settings.tiktok_url"
+                  class="form-input"
+                  placeholder="@mitienda">
+              </div>
+            </div>
+          </div>
+
+          <!-- Opciones -->
+          <div class="settings-section">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              Opciones del Catálogo
+            </h3>
+            
+            <div class="options-list">
+              <label class="option-item">
+                <div class="option-info">
+                  <span class="option-label">Mostrar precios</span>
+                  <span class="option-desc">Los clientes podrán ver los precios de los productos</span>
+                </div>
+                <div class="toggle-switch-wrapper">
+                  <input type="checkbox" [(ngModel)]="settings.show_prices" class="toggle-input">
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+
+              <label class="option-item">
+                <div class="option-info">
+                  <span class="option-label">Permitir carrito de compras</span>
+                  <span class="option-desc">Los clientes podrán agregar productos al carrito</span>
+                </div>
+                <div class="toggle-switch-wrapper">
+                  <input type="checkbox" [(ngModel)]="settings.allow_cart" class="toggle-input">
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+
+              <label class="option-item">
+                <div class="option-info">
+                  <span class="option-label">Catálogo público</span>
+                  <span class="option-desc">Cualquiera con el link podrá ver el catálogo</span>
+                </div>
+                <div class="toggle-switch-wrapper">
+                  <input type="checkbox" [(ngModel)]="settings.is_public" class="toggle-input">
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Mensajes -->
+          <div class="settings-section">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+              </svg>
+              Mensajes
+            </h3>
+            
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label>Mensaje de bienvenida</label>
+                <textarea 
+                  [(ngModel)]="settings.welcome_message"
+                  class="form-input"
+                  rows="2"
+                  placeholder="¡Bienvenido!"></textarea>
+              </div>
+
+              <div class="form-group full-width">
+                <label>Mensaje al hacer pedido por WhatsApp</label>
+                <textarea 
+                  [(ngModel)]="settings.order_message"
+                  class="form-input"
+                  rows="2"
+                  placeholder="¡Hola! Me interesa..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <div class="form-actions">
+            <button 
+              class="btn-primary save-btn" 
+              (click)="saveSettings()"
+              [disabled]="isSaving">
+              <ion-spinner *ngIf="isSaving" name="crescent" class="btn-spinner"></ion-spinner>
+              <svg *ngIf="!isSaving" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              {{ isSaving ? 'Guardando...' : 'Guardar Configuración' }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ==========================================
+     MODAL SELECCIONAR PRODUCTOS
+     ========================================== -->
+<div *ngIf="showProductSelector" class="modal-overlay" (click)="closeProductSelector()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Seleccionar Productos para el Catálogo</h2>
+      <button class="modal-close" (click)="closeProductSelector()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Search in modal -->
+      <div class="modal-search">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          [(ngModel)]="productSelectorSearch"
+          placeholder="Buscar productos..."
+          class="form-input">
+      </div>
+
+      <!-- Select all -->
+      <div class="select-all-row">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [checked]="areAllSelected()"
+            (change)="toggleSelectAll($event)">
+          <span class="checkbox-custom"></span>
+          <span class="checkbox-text">Seleccionar todos los productos</span>
+        </label>
+        <span class="selected-count">{{ getSelectedCount() }} seleccionados</span>
+      </div>
+
+      <!-- Products list -->
+      <div class="product-selector-list">
+        <div 
+          *ngFor="let product of filteredAvailableProducts" 
+          class="product-selector-item"
+          [class.selected]="isProductSelected(product.id)">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox" 
+              [checked]="isProductSelected(product.id)"
+              (change)="toggleProductSelection(product.id, $event)">
+            <span class="checkbox-custom"></span>
+            <div class="product-selector-info">
+              <div class="product-selector-image" *ngIf="product.image">
+                <img [src]="product.image" [alt]="product.name">
+              </div>
+              <div class="product-selector-placeholder" *ngIf="!product.image">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <div class="product-selector-details">
+                <div class="product-selector-name">{{ product.name }}</div>
+                <div class="product-selector-meta">
+                  <span>{{ formatCurrency(product.price) }}</span>
+                  <span *ngIf="product.category_name" class="category-tag">{{ product.category_name }}</span>
+                  <span [class]="product.stock > 0 ? 'stock-ok' : 'stock-out'">
+                    Stock: {{ product.stock }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Empty state in modal -->
+      <div *ngIf="filteredAvailableProducts.length === 0" class="modal-empty">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <p>No se encontraron productos</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeProductSelector()">Cancelar</button>
+      <button class="btn-primary" (click)="saveProductSelection()" [disabled]="getSelectedCount() === 0">
+        Guardar Selección ({{ getSelectedCount() }})
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<ion-toast 
+  [isOpen]="showToast" 
+  [message]="toastMessage" 
+  [duration]="3000"
+  [color]="toastColor"
+  position="top">
+</ion-toast>

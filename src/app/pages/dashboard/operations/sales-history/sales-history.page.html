@@ -1,0 +1,314 @@
+<div class="page-container">
+  <div class="page-content">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <div class="page-header-content">
+        <div>
+          <h1 class="page-title">Historial de Ventas</h1>
+          <p class="page-subtitle">Reporte completo de ventas completadas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon purple">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Total Ventas</p>
+          <p class="stat-value">{{ stats.totalSales }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Ingresos Totales</p>
+          <p class="stat-value">{{ formatCurrency(stats.totalRevenue) }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Ticket Promedio</p>
+          <p class="stat-value">{{ formatCurrency(stats.averageTicket) }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon yellow">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Ventas Hoy</p>
+          <p class="stat-value">{{ stats.todaySales }}</p>
+          <p class="stat-subtitle">{{ formatCurrency(stats.todayRevenue) }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon purple">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Esta Semana</p>
+          <p class="stat-value">{{ stats.weekSales }}</p>
+          <p class="stat-subtitle">{{ formatCurrency(stats.weekRevenue) }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <p class="stat-label">Este Mes</p>
+          <p class="stat-value">{{ stats.monthSales }}</p>
+          <p class="stat-subtitle">{{ formatCurrency(stats.monthRevenue) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid" *ngIf="salesByDate.length > 0">
+      <!-- Sales Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Ventas de los últimos 30 días</h3>
+        </div>
+        <div class="chart-container">
+          <div class="bar-chart">
+            <div *ngFor="let sale of salesByDate" class="bar-wrapper">
+              <div class="bar" [style.height]="getBarHeight(sale.total)">
+                <span class="bar-tooltip">
+                  {{ formatDate(sale.date) }}<br>
+                  {{ sale.count }} ventas<br>
+                  {{ formatCurrency(sale.total) }}
+                </span>
+              </div>
+              <span class="bar-label">{{ sale.date | date:'dd' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Products -->
+      <div class="chart-card" *ngIf="topProducts.length > 0">
+        <div class="chart-header">
+          <h3 class="chart-title">Productos Más Vendidos</h3>
+        </div>
+        <div class="top-products-list">
+          <div *ngFor="let product of topProducts; let i = index" class="product-item">
+            <div class="product-rank">{{ i + 1 }}</div>
+            <div class="product-info">
+              <div class="product-name">{{ product.product_name }}</div>
+              <div class="product-stats">
+                <span>{{ product.quantity }} vendidos</span>
+                <span class="product-total">{{ formatCurrency(product.total) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-card">
+      <div class="filters-row">
+        <div class="search-box">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onFilterChange()"
+            placeholder="Buscar por número de orden, cliente o notas..."
+            class="search-input">
+        </div>
+        
+        <div class="filter-select-wrapper">
+          <select [(ngModel)]="dateFilter" (ngModelChange)="onFilterChange()" class="filter-select">
+            <option value="all">Todas las fechas</option>
+            <option value="today">Hoy</option>
+            <option value="week">Esta semana</option>
+            <option value="month">Este mes</option>
+            <option value="custom">Personalizado</option>
+          </select>
+        </div>
+
+        <div class="date-range" *ngIf="dateFilter === 'custom'">
+          <input 
+            type="date" 
+            [(ngModel)]="startDate"
+            (ngModelChange)="onFilterChange()"
+            class="date-input">
+          <span class="date-separator">a</span>
+          <input 
+            type="date" 
+            [(ngModel)]="endDate"
+            (ngModelChange)="onFilterChange()"
+            class="date-input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Table -->
+    <div class="sales-table-container" *ngIf="filteredSales.length > 0">
+      <table class="sales-table">
+        <thead>
+          <tr>
+            <th>Orden</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let sale of filteredSales">
+            <td>
+              <div class="order-number-cell">{{ sale.order_number }}</div>
+            </td>
+            <td>
+              <div class="customer-info-cell">
+                <div class="customer-avatar-small" [style.backgroundColor]="getCustomerColor(sale.customer_id || sale.id)">
+                  {{ getInitials(getCustomerName(sale)) }}
+                </div>
+                <div>
+                  <div class="customer-name-cell">{{ getCustomerName(sale) }}</div>
+                  <div class="customer-notes-cell" *ngIf="sale.notes">{{ sale.notes }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="date-cell">
+                <div class="date-main">{{ formatDate(sale.completed_at) }}</div>
+                <div class="date-time">{{ sale.completed_at | date:'shortTime' }}</div>
+              </div>
+            </td>
+            <td>
+              <span class="items-count">{{ sale.items_count || 0 }} items</span>
+            </td>
+            <td>
+              <span class="total-amount">{{ formatCurrency(sale.total) }}</span>
+            </td>
+            <td>
+              <div class="table-actions">
+                <button class="btn-action view" (click)="viewSaleDetails(sale)" title="Ver detalles">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredSales.length === 0 && !isLoading" class="empty-state">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+      <h3>{{ searchQuery ? 'No se encontraron ventas' : 'Sin ventas completadas' }}</h3>
+      <p>{{ searchQuery ? 'Intenta con otro término de búsqueda' : 'Las ventas completadas aparecerán aquí' }}</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando historial...</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==========================================
+     MODAL - FUERA DEL PAGE-CONTAINER
+     ========================================== -->
+<div *ngIf="showDetailsModal && selectedSale" class="modal-overlay" (click)="closeDetailsModal()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Detalle de Venta - {{ selectedSale.order_number }}</h2>
+      <button class="modal-close" (click)="closeDetailsModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="sale-details-header">
+        <div class="detail-item">
+          <span class="detail-label">Cliente:</span>
+          <span class="detail-value">{{ getCustomerName(selectedSale) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Fecha:</span>
+          <span class="detail-value">{{ formatDateTime(selectedSale.completed_at) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Tipo:</span>
+          <span class="detail-value">{{ selectedSale.delivery_type === 'delivery' ? '🚚 Envío' : '📦 Recoger' }}</span>
+        </div>
+      </div>
+
+      <div class="sale-items-detail">
+        <h3 class="section-title">Productos</h3>
+        <div class="items-list">
+          <div *ngFor="let item of saleItems" class="item-row">
+            <div class="item-info">
+              <span class="item-name">{{ item.product_name }}</span>
+              <span class="item-quantity">{{ item.quantity }} x {{ formatCurrency(item.price) }}</span>
+            </div>
+            <span class="item-subtotal">{{ formatCurrency(item.subtotal) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sale-totals">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span>{{ formatCurrency(selectedSale.subtotal) }}</span>
+        </div>
+        <div class="total-row">
+          <span>IVA (16%)</span>
+          <span>{{ formatCurrency(selectedSale.tax) }}</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total</span>
+          <span>{{ formatCurrency(selectedSale.total) }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="selectedSale.notes" class="sale-notes">
+        <h3 class="section-title">Notas</h3>
+        <p>{{ selectedSale.notes }}</p>
+      </div>
+    </div>
+  </div>
+</div>

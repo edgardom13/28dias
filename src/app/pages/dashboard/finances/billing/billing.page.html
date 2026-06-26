@@ -1,0 +1,273 @@
+<div class="page-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <div>
+        <h1 class="page-title">Configuración Fiscal</h1>
+        <p class="page-subtitle">Configura los datos para facturación electrónica</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando configuración...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="config-form">
+    
+    <!-- Sección: Datos Fiscales -->
+    <div class="config-section">
+      <div class="section-header">
+        <div class="section-icon fiscal">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="section-title">Datos Fiscales</h2>
+          <p class="section-subtitle">Información de tu negocio ante el SAT</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>RFC *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="fiscalData.rfc"
+            class="form-input"
+            placeholder="XAXX010101000"
+            maxlength="13"
+            style="text-transform: uppercase;">
+        </div>
+
+        <div class="form-group">
+          <label>Razón Social *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="fiscalData.business_name"
+            class="form-input"
+            placeholder="Nombre del negocio">
+        </div>
+
+        <div class="form-group">
+          <label>Régimen Fiscal *</label>
+          <select [(ngModel)]="fiscalData.tax_regime" class="form-input">
+            <option *ngFor="let regime of taxRegimes" [value]="regime.code">
+              {{ regime.code }} - {{ regime.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Código Postal *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="fiscalData.postal_code"
+            class="form-input"
+            placeholder="00000"
+            maxlength="5">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Dirección Fiscal</label>
+          <input 
+            type="text" 
+            [(ngModel)]="fiscalData.fiscal_address"
+            class="form-input"
+            placeholder="Calle, número, colonia, ciudad">
+        </div>
+
+        <div class="form-group">
+          <label>Lugar de Expedición</label>
+          <input 
+            type="text" 
+            [(ngModel)]="fiscalData.expedition_place"
+            class="form-input"
+            placeholder="Código postal donde expides facturas">
+          <p class="form-hint">Si está vacío, se usará el código postal fiscal</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Credenciales Finkok -->
+    <div class="config-section">
+      <div class="section-header">
+        <div class="section-icon finkok">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="section-title">Proveedor de Timbrado (Finkok)</h2>
+          <p class="section-subtitle">Credenciales de tu cuenta Finkok</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Usuario Finkok *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="finkokData.username"
+            class="form-input"
+            placeholder="usuario@finkok.com">
+        </div>
+
+        <div class="form-group">
+          <label>Contraseña Finkok *</label>
+          <input 
+            type="password" 
+            [(ngModel)]="finkokData.password"
+            class="form-input"
+            placeholder="••••••••">
+        </div>
+
+        <div class="form-group full-width">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="finkokData.test_mode">
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-text">
+              <strong>Modo Pruebas</strong> - Las facturas no tendrán validez fiscal
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+          <strong>¿No tienes cuenta Finkok?</strong>
+          <p>Regístrate en <a href="https://www.finkok.com" target="_blank">finkok.com</a> para obtener tus credenciales. El plan básico incluye 50 timbres mensuales.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Certificados CSD -->
+    <div class="config-section">
+      <div class="section-header">
+        <div class="section-icon csd">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="section-title">Certificados de Sello Digital (CSD)</h2>
+          <p class="section-subtitle">Archivos .cer y .key del SAT</p>
+        </div>
+      </div>
+
+      <div class="certificates-grid">
+        <!-- Certificado .cer -->
+        <div class="certificate-card">
+          <div class="certificate-header">
+            <span class="certificate-type">Archivo .CER</span>
+            <span class="certificate-status" [class.loaded]="cerContent">
+              {{ cerContent ? '✅ Cargado' : '⏳ Pendiente' }}
+            </span>
+          </div>
+          <div class="certificate-body">
+            <p class="certificate-desc">Certificado de sello digital (público)</p>
+            <label class="file-upload-btn">
+              <input 
+                type="file" 
+                accept=".cer"
+                (change)="onCerFileSelected($event)"
+                hidden>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+              </svg>
+              {{ cerFile ? cerFile.name : 'Seleccionar archivo' }}
+            </label>
+          </div>
+        </div>
+
+        <!-- Certificado .key -->
+        <div class="certificate-card">
+          <div class="certificate-header">
+            <span class="certificate-type">Archivo .KEY</span>
+            <span class="certificate-status" [class.loaded]="keyContent">
+              {{ keyContent ? '✅ Cargado' : '⏳ Pendiente' }}
+            </span>
+          </div>
+          <div class="certificate-body">
+            <p class="certificate-desc">Llave privada de sello digital</p>
+            <label class="file-upload-btn">
+              <input 
+                type="file" 
+                accept=".key"
+                (change)="onKeyFileSelected($event)"
+                hidden>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+              </svg>
+              {{ keyFile ? keyFile.name : 'Seleccionar archivo' }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Contraseña del CSD</label>
+          <input 
+            type="password" 
+            [(ngModel)]="cerPassword"
+            class="form-input"
+            placeholder="Contraseña del certificado">
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de Expiración</label>
+          <input 
+            type="date" 
+            [(ngModel)]="cerExpiration"
+            class="form-input">
+        </div>
+      </div>
+
+      <div class="info-box warning">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <div>
+          <strong>¿Cómo obtener los CSD?</strong>
+          <p>Descarga tus certificados desde el portal del SAT en <a href="https://www.sat.gob.mx" target="_blank">sat.gob.mx</a> → Trámites del RFC → Certificados.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+      <button class="btn-secondary" (click)="loadConfig()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Recargar
+      </button>
+      <button class="btn-primary" (click)="saveConfig()" [disabled]="isSaving">
+        <svg *ngIf="!isSaving" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <ion-spinner *ngIf="isSaving" name="crescent" class="btn-spinner"></ion-spinner>
+        {{ isSaving ? 'Guardando...' : 'Guardar Configuración' }}
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <ion-toast 
+    [isOpen]="showToast" 
+    [message]="toastMessage" 
+    [duration]="3000"
+    [color]="toastColor"
+    position="top">
+  </ion-toast>
+
+</div>

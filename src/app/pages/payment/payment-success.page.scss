@@ -1,0 +1,122 @@
+.success-content {
+  --background: linear-gradient(135deg, #6B21A8 0%, #5E1D93 100%);
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+}
+
+.success-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40px 24px;
+  text-align: center;
+  color: #FFFFFF;
+}
+
+.success-icon {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 32px;
+  background: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  i {
+    font-size: 80px;
+    color: #10B981;
+  }
+}
+
+.success-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.5px;
+  
+  @media (max-width: 767px) {
+    font-size: 26px;
+  }
+}
+
+.success-text {
+  font-size: 20px;
+  margin: 0 0 12px 0;
+  opacity: 0.95;
+  
+  @media (max-width: 767px) {
+    font-size: 16px;
+  }
+}
+
+.success-subtext {
+  font-size: 16px;
+  margin: 0 0 32px 0;
+  opacity: 0.9;
+  max-width: 400px;
+  line-height: 1.5;
+  
+  @media (max-width: 767px) {
+    font-size: 14px;
+  }
+}
+
+.btn-continue {
+  padding: 14px 32px;
+  background: #FFFFFF;
+  color: #6B21A8;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  margin-top: 16px;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.loading-indicator {
+  p {
+    font-size: 14px;
+    opacity: 0.8;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

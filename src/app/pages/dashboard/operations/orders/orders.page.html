@@ -1,0 +1,946 @@
+<div class="page-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <div>
+        <h1 class="page-title">Pedidos</h1>
+        <p class="page-subtitle">Gestiona los pedidos de tus clientes</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn-primary" (click)="openCreateModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Nuevo Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Total Pedidos</p>
+        <p class="stat-value">{{ totalOrders }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon yellow">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Pendientes</p>
+        <p class="stat-value">{{ pendingOrders }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">En Proceso</p>
+        <p class="stat-value">{{ processingOrders }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Completados</p>
+        <p class="stat-value">{{ completedOrders }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="filters-row">
+      <div class="search-box">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="filterOrders()"
+          placeholder="Buscar por número, cliente, método de pago..."
+          class="search-input">
+      </div>
+      <div class="filter-select-wrapper">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="filterOrders()" class="filter-select">
+          <option value="all">Todos los estados</option>
+          <option value="pending">Pendientes</option>
+          <option value="processing">En Proceso</option>
+          <option value="completed">Completados</option>
+          <option value="cancelled">Cancelados</option>
+        </select>
+      </div>
+      <div class="filter-select-wrapper">
+        <select [(ngModel)]="paymentStatusFilter" (ngModelChange)="filterOrders()" class="filter-select">
+          <option value="all">Todos los pagos</option>
+          <option value="unpaid">No Pagados</option>
+          <option value="partial">Pago Parcial</option>
+          <option value="paid">Pagados</option>
+          <option value="refunded">Reembolsados</option>
+        </select>
+      </div>
+      <div class="filter-select-wrapper">
+        <select [(ngModel)]="sourceFilter" (ngModelChange)="filterOrders()" class="filter-select">
+          <option value="all">Todos los orígenes</option>
+          <option value="manual">✍️ Manual</option>
+          <option value="catalog">📱 Catálogo</option>
+          <option value="website">🌐 Sitio Web</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="orders-table-container" *ngIf="filteredOrders.length > 0">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Pedido</th>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Pago</th>
+          <th>Origen</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of filteredOrders"
+            [class.completed-row]="order.status === 'completed'"
+            [class.cancelled-row]="order.status === 'cancelled'">
+          <td>
+            <div class="order-number">{{ order.order_number }}</div>
+            <div class="order-type" *ngIf="order.delivery_type === 'delivery'">🚚 Envío</div>
+            <div class="order-type" *ngIf="order.delivery_type === 'pickup'">📦 Recoger</div>
+          </td>
+          <td>
+            <div class="customer-info-cell">
+              <div class="customer-avatar-small" [style.backgroundColor]="getCustomerColor(order.customer_id || order.id)">
+                {{ getInitials(getCustomerName(order.customer_id || '')) }}
+              </div>
+              <div>
+                <div class="customer-name-cell">{{ getCustomerName(order.customer_id || '') }}</div>
+                <div class="order-notes-preview" *ngIf="order.notes">{{ order.notes }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ formatDate(order.created_at) }}</td>
+          <td>
+            <span class="items-count">{{ order.items?.length || 0 }} items</span>
+          </td>
+          <td class="order-total">{{ formatCurrency(order.total) }}</td>
+          <td>
+            <span class="status-badge" [class]="getStatusBadgeClass(order.status)">
+              {{ getStatusText(order.status) }}
+            </span>
+          </td>
+          <td>
+            <div class="payment-simple-display">
+              <span class="payment-status-badge" [class]="getPaymentStatusBadgeClass(order.payment_status || 'unpaid')">
+                {{ getPaymentStatusText(order.payment_status || 'unpaid') }}
+              </span>
+              <span class="payment-method-simple" *ngIf="order.payment_method && order.payment_method !== 'Pendiente'">
+                {{ getPaymentMethodIcon(order.payment_method) }} {{ order.payment_method }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <span class="source-badge" [class]="getSourceBadgeClass(order.source || 'manual')">
+              {{ getSourceIcon(order.source || 'manual') }} {{ getSourceText(order.source || 'manual') }}
+            </span>
+          </td>
+          <!-- ✅ ACCIONES - Cancelar y Eliminar SIEMPRE habilitados -->
+<td>
+  <div class="table-actions">
+    <!-- 1. Ver detalles -->
+    <button class="btn-action view" (click)="viewOrderDetails(order)" title="Ver detalles">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+      </svg>
+    </button>
+    
+    <!-- 2. Confirmar - Solo si NO está pagado -->
+    <button 
+      *ngIf="shouldShowConfirmButton(order)"
+      class="btn-action confirm" 
+      (click)="openConfirmModal(order)" 
+      title="Confirmar Pedido y Pago">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </button>
+
+    <!-- Badge de "Pagado" -->
+    <div 
+      *ngIf="order.payment_status === 'paid'"
+      class="paid-badge-icon" 
+      title="✅ Pagado">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #10B981;">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    
+    <!-- 3. Cancelar - ✅ SIEMPRE HABILITADO -->
+    <button 
+      class="btn-action cancel" 
+      (click)="cancelOrder(order)" 
+      title="Cancelar pedido">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    
+    <!-- 4. Eliminar - ✅ SIEMPRE HABILITADO -->
+    <button 
+      class="btn-action delete" 
+      (click)="deleteOrder(order)" 
+      title="Eliminar pedido">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+      </svg>
+    </button>
+  </div>
+</td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredOrders.length === 0 && !isLoading" class="empty-state">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+    </svg>
+    <h3>{{ searchQuery ? 'No se encontraron pedidos' : 'Sin pedidos' }}</h3>
+    <p>{{ searchQuery ? 'Intenta con otro término de búsqueda' : 'Comienza creando tu primer pedido' }}</p>
+    <button *ngIf="!searchQuery" class="btn-primary" (click)="openCreateModal()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Crear Pedido
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando...</p>
+  </div>
+</div>
+
+<!-- ==========================================
+     CREATE ORDER MODAL
+     ========================================== -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Nuevo Pedido</h2>
+      <button class="modal-close" (click)="closeCreateModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Customer Selection -->
+      <div class="form-group full-width">
+        <label>Cliente</label>
+        <div class="customer-selector">
+          <div class="customer-input-wrapper">
+            <input 
+              type="text" 
+              [(ngModel)]="customerSearchQuery"
+              (ngModelChange)="onCustomerSearch()"
+              (focus)="showCustomerDropdown = true"
+              (blur)="hideCustomerDropdown()"
+              class="form-input customer-search-input"
+              placeholder="Buscar cliente o dejar vacío para anónimo..."
+              autocomplete="off">
+            <svg class="search-icon-small" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          
+          <div class="customer-dropdown" *ngIf="showCustomerDropdown && filteredCustomers.length > 0">
+            <div 
+              *ngFor="let customer of filteredCustomers" 
+              class="customer-option"
+              (mousedown)="selectCustomer(customer)">
+              <div class="customer-option-avatar" [style.backgroundColor]="getCustomerColor(customer.id)">
+                {{ getInitials(customer.name) }}
+              </div>
+              <div class="customer-option-info">
+                <div class="customer-option-name">{{ customer.name }}</div>
+                <div class="customer-option-details" *ngIf="customer.phone || customer.email">
+                  <span *ngIf="customer.phone">📱 {{ customer.phone }}</span>
+                  <span *ngIf="customer.email">✉️ {{ customer.email }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="customer-dropdown empty" *ngIf="showCustomerDropdown && filteredCustomers.length === 0 && customerSearchQuery.trim()">
+            <p>No se encontraron clientes. El pedido será anónimo.</p>
+          </div>
+        </div>
+        <p class="form-help">Busca un cliente o deja vacío para pedido anónimo</p>
+      </div>
+
+      <!-- DELIVERY TYPE -->
+      <div class="form-group full-width">
+        <label>Tipo de Entrega <span class="required-asterisk">*</span></label>
+        <div class="delivery-type-options">
+          <label class="delivery-option" [class.active]="orderForm.delivery_type === 'pickup'">
+            <input type="radio" [(ngModel)]="orderForm.delivery_type" value="pickup" required>
+            <span>📦 Recoger en tienda</span>
+          </label>
+          <label class="delivery-option" [class.active]="orderForm.delivery_type === 'delivery'">
+            <input type="radio" [(ngModel)]="orderForm.delivery_type" value="delivery" required>
+            <span>🚚 Envío a domicilio</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Delivery Address -->
+      <div class="form-group full-width" *ngIf="orderForm.delivery_type === 'delivery'">
+        <label>Dirección de Entrega <span class="required-asterisk">*</span></label>
+        <input 
+          type="text" 
+          [(ngModel)]="orderForm.delivery_address" 
+          class="form-input" 
+          placeholder="Calle, número, colonia, ciudad"
+          required>
+      </div>
+
+      <!-- Estimated Date -->
+      <div class="form-group full-width">
+        <label>Fecha Estimada de Entrega</label>
+        <input 
+          type="datetime-local" 
+          [(ngModel)]="orderForm.estimated_date" 
+          class="form-input date-input">
+        <p class="form-help">Opcional - Fecha y hora estimada de entrega</p>
+      </div>
+
+      <!-- PAYMENT METHOD -->
+      <div class="form-group full-width">
+        <label>Método de Pago <span class="required-asterisk">*</span></label>
+        <select 
+          [(ngModel)]="orderForm.payment_method" 
+          class="form-input"
+          required>
+          <option value="" disabled>Seleccionar método de pago...</option>
+          <option *ngFor="let method of paymentMethods" [value]="method.name">
+            {{ getPaymentMethodIcon(method.name) }} {{ method.name }}
+          </option>
+          <option value="Efectivo" *ngIf="paymentMethods.length === 0">💵 Efectivo</option>
+        </select>
+      </div>
+
+      <!-- PAYMENT STATUS - Solo para casos especiales (crédito) -->
+      <div class="form-group full-width">
+        <label>Estado del Pago <span class="required-asterisk">*</span></label>
+        <div class="payment-status-options">
+          <label class="payment-status-option" [class.active]="orderForm.payment_status === 'paid'">
+            <input type="radio" [(ngModel)]="orderForm.payment_status" value="paid" required>
+            <span class="status-indicator paid"></span>
+            <span>✅ Pagado (cobrado ahora)</span>
+          </label>
+          <label class="payment-status-option" [class.active]="orderForm.payment_status === 'unpaid'">
+            <input type="radio" [(ngModel)]="orderForm.payment_status" value="unpaid" required>
+            <span class="status-indicator unpaid"></span>
+            <span>❌ A crédito (pendiente de pago)</span>
+          </label>
+        </div>
+        <p class="form-help">
+          💡 Por defecto: <strong>Pagado</strong> (se cobró en POS). Cambia a "A crédito" si el cliente pagará después.
+        </p>
+      </div>
+
+      <!-- Order Items -->
+      <div class="order-items-section full-width">
+        <h3 class="section-title">Items del Pedido <span class="required-asterisk">*</span></h3>
+        
+        <div class="add-item-form">
+          <div class="product-selector">
+            <div class="product-input-wrapper">
+              <input 
+                type="text" 
+                [(ngModel)]="newItem.product_name"
+                (ngModelChange)="onProductSearch()"
+                (focus)="showProductDropdown = true"
+                (blur)="hideProductDropdown()"
+                placeholder="Buscar producto del inventario..."
+                class="form-input product-search-input"
+                autocomplete="off">
+              <svg class="search-icon-small" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            
+            <div class="product-dropdown" *ngIf="showProductDropdown && filteredProducts.length > 0">
+              <div 
+                *ngFor="let product of filteredProducts" 
+                class="product-option"
+                (mousedown)="selectProduct(product)">
+                <div class="product-option-image" *ngIf="product.image">
+                  <img [src]="product.image" [alt]="product.name">
+                </div>
+                <div class="product-option-placeholder" *ngIf="!product.image">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                  </svg>
+                </div>
+                <div class="product-option-info">
+                  <div class="product-option-name">{{ product.name }}</div>
+                  <div class="product-option-details">
+                    <span class="product-option-price">{{ formatCurrency(product.price) }}</span>
+                    <span class="product-option-stock">Stock: {{ product.stock }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="product-dropdown empty" *ngIf="showProductDropdown && filteredProducts.length === 0 && newItem.product_name.trim()">
+              <p>Producto no encontrado. Se agregará como producto personalizado.</p>
+            </div>
+          </div>
+          
+          <input 
+            type="number" 
+            [(ngModel)]="newItem.quantity" 
+            placeholder="Cant." 
+            class="form-input small"
+            min="1">
+          <input 
+            type="number" 
+            [(ngModel)]="newItem.price" 
+            placeholder="Precio" 
+            class="form-input"
+            min="0"
+            step="0.01"
+            [readonly]="newItem.product_id ? true : false"
+            [class.readonly-field]="newItem.product_id">
+          <button (click)="addItem()" class="btn-add-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="items-list" *ngIf="orderItems.length > 0">
+          <div *ngFor="let item of orderItems; let i = index" class="item-row">
+            <div class="item-info">
+              <span class="item-name">{{ item.product_name }}</span>
+              <span class="item-details">{{ item.quantity }} x {{ formatCurrency(item.price) }}</span>
+            </div>
+            <span class="item-subtotal">{{ formatCurrency(item.subtotal) }}</span>
+            <button (click)="removeItem(i)" class="btn-remove-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-items-message" *ngIf="orderItems.length === 0">
+          <p>⚠️ Agrega al menos un item para continuar</p>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="order-totals full-width" *ngIf="orderItems.length > 0">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span>{{ formatCurrency(orderSubtotal) }}</span>
+        </div>
+        <div class="total-row">
+          <span>IVA (16%)</span>
+          <span>{{ formatCurrency(orderTax) }}</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total</span>
+          <span>{{ formatCurrency(orderTotal) }}</span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group full-width">
+        <label>Notas</label>
+        <textarea 
+          [(ngModel)]="orderForm.notes" 
+          class="form-input" 
+          rows="3" 
+          placeholder="Notas adicionales sobre el pedido...">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeCreateModal()">
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn-primary" 
+        (click)="createOrder()"
+        [disabled]="isLoading || !isFormValid">
+        {{ isLoading ? 'Creando...' : 'Crear Pedido' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     ✅ CONFIRM ORDER MODAL - INTEGRAL
+     ========================================== -->
+<div *ngIf="showConfirmModal && confirmOrder" class="modal-overlay" (click)="closeConfirmModal()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        ✅ Confirmar Pedido - {{ confirmOrder.order_number }}
+      </h2>
+      <button class="modal-close" (click)="closeConfirmModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      
+      <!-- Info del pedido -->
+      <div class="confirm-order-info">
+        <div class="info-row">
+          <span class="info-label">📋 Cliente:</span>
+          <span class="info-value">{{ getCustomerName(confirmOrder.customer_id || '') }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">📦 Tipo:</span>
+          <span class="info-value">{{ confirmOrder.delivery_type === 'delivery' ? '🚚 Envío a domicilio' : '📦 Recoger en tienda' }}</span>
+        </div>
+        <div class="info-row" *ngIf="confirmOrder.delivery_address">
+          <span class="info-label">📍 Dirección:</span>
+          <span class="info-value">{{ confirmOrder.delivery_address }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">📱 Origen:</span>
+          <span class="info-value">
+            <span class="source-badge" [class]="getSourceBadgeClass(confirmOrder.source || 'manual')">
+              {{ getSourceIcon(confirmOrder.source || 'manual') }} {{ getSourceText(confirmOrder.source || 'manual') }}
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           SECCIÓN DE PRODUCTOS - AGREGAR / ELIMINAR
+           ========================================== -->
+      <div class="confirm-section">
+        <h3 class="section-title">
+          🛒 Productos del Pedido
+          <span class="section-badge">{{ confirmItems.length }} items</span>
+        </h3>
+
+        <!-- Agregar producto -->
+        <div class="add-item-form">
+          <div class="product-selector">
+            <div class="product-input-wrapper">
+              <input 
+                type="text" 
+                [(ngModel)]="confirmNewItem.product_name"
+                (ngModelChange)="onConfirmProductSearch()"
+                (focus)="showConfirmProductDropdown = true"
+                (blur)="hideConfirmProductDropdown()"
+                placeholder="🔍 Buscar producto para agregar..."
+                class="form-input product-search-input"
+                autocomplete="off">
+              <svg class="search-icon-small" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            
+            <!-- Dropdown de productos -->
+            <div class="product-dropdown" *ngIf="showConfirmProductDropdown && confirmFilteredProducts.length > 0">
+              <div 
+                *ngFor="let product of confirmFilteredProducts" 
+                class="product-option"
+                (mousedown)="selectConfirmProduct(product)">
+                <div class="product-option-image" *ngIf="product.image">
+                  <img [src]="product.image" [alt]="product.name">
+                </div>
+                <div class="product-option-placeholder" *ngIf="!product.image">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                  </svg>
+                </div>
+                <div class="product-option-info">
+                  <div class="product-option-name">{{ product.name }}</div>
+                  <div class="product-option-details">
+                    <span class="product-option-price">{{ formatCurrency(product.price) }}</span>
+                    <span class="product-option-stock">Stock: {{ product.stock }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="product-dropdown empty" *ngIf="showConfirmProductDropdown && confirmFilteredProducts.length === 0 && confirmNewItem.product_name.trim()">
+              <p>Producto no encontrado. Se agregará como producto personalizado.</p>
+            </div>
+          </div>
+          
+          <input 
+            type="number" 
+            [(ngModel)]="confirmNewItem.quantity" 
+            placeholder="Cant." 
+            class="form-input small"
+            min="1">
+          <input 
+            type="number" 
+            [(ngModel)]="confirmNewItem.price" 
+            placeholder="Precio" 
+            class="form-input"
+            min="0"
+            step="0.01"
+            [readonly]="confirmNewItem.product_id ? true : false"
+            [class.readonly-field]="confirmNewItem.product_id">
+          <button (click)="addConfirmItem()" class="btn-add-item" title="Agregar producto">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Lista de productos actuales -->
+        <div class="items-list" *ngIf="confirmItems.length > 0">
+          <div *ngFor="let item of confirmItems; let i = index" class="item-row">
+            <div class="item-info">
+              <span class="item-name">{{ item.product_name }}</span>
+              <span class="item-details">
+                <!-- Cantidad editable inline -->
+                <input 
+                  type="number" 
+                  [(ngModel)]="item.quantity"
+                  (ngModelChange)="updateConfirmItemSubtotal(i)"
+                  class="inline-qty-input" 
+                  min="1"
+                  title="Editar cantidad">
+                × {{ formatCurrency(item.price) }}
+              </span>
+            </div>
+            <span class="item-subtotal">{{ formatCurrency(item.subtotal) }}</span>
+            <button (click)="removeConfirmItem(i)" class="btn-remove-item" title="Eliminar producto">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-items-message" *ngIf="confirmItems.length === 0">
+          <p>⚠️ Agrega al menos un producto al pedido</p>
+        </div>
+      </div>
+
+      <!-- Totales actualizados -->
+      <div class="order-totals" *ngIf="confirmItems.length > 0">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span>{{ formatCurrency(confirmSubtotal) }}</span>
+        </div>
+        <div class="total-row">
+          <span>IVA (16%)</span>
+          <span>{{ formatCurrency(confirmTax) }}</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total</span>
+          <span>{{ formatCurrency(confirmTotal) }}</span>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           SECCIÓN DE PAGO - MÉTODO OBLIGATORIO
+           ========================================== -->
+      <div class="confirm-section">
+        <h3 class="section-title">💳 Información de Pago</h3>
+
+        <div class="form-grid">
+          <!-- Método de Pago - OBLIGATORIO -->
+          <div class="form-group full-width">
+            <label>Método de Pago <span class="required-asterisk">*</span></label>
+            <select 
+              [(ngModel)]="confirmForm.payment_method" 
+              class="form-input"
+              required>
+              <option value="" disabled selected>⚠️ Seleccionar cómo pagó el cliente...</option>
+              <option *ngFor="let method of paymentMethods" [value]="method.name">
+                {{ getPaymentMethodIcon(method.name) }} {{ method.name }}
+              </option>
+              <option value="Efectivo">💵 Efectivo</option>
+              <option value="Transferencia">🏦 Transferencia</option>
+              <option value="Tarjeta">💳 Tarjeta</option>
+            </select>
+            <p class="form-help">
+              ⚠️ <strong>Obligatorio:</strong> Selecciona el método de pago para confirmar el pedido
+            </p>
+          </div>
+
+          <!-- Estado del Pago -->
+          <div class="form-group full-width">
+            <label>Estado del Pago <span class="required-asterisk">*</span></label>
+            <div class="payment-status-options">
+              <label class="payment-status-option" [class.active]="confirmForm.payment_status === 'paid'">
+                <input type="radio" [(ngModel)]="confirmForm.payment_status" value="paid" required>
+                <span class="status-indicator paid"></span>
+                <span>✅ Pagado</span>
+              </label>
+              <label class="payment-status-option" [class.active]="confirmForm.payment_status === 'partial'">
+                <input type="radio" [(ngModel)]="confirmForm.payment_status" value="partial" required>
+                <span class="status-indicator partial"></span>
+                <span>⚠️ Parcial</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Monto Pagado (si es parcial) -->
+          <div class="form-group" *ngIf="confirmForm.payment_status === 'partial'">
+            <label>Monto Pagado <span class="required-asterisk">*</span></label>
+            <input 
+              type="number" 
+              [(ngModel)]="confirmForm.payment_amount" 
+              class="form-input"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [max]="confirmTotal">
+            <p class="form-help">Total del pedido: {{ formatCurrency(confirmTotal) }}</p>
+          </div>
+
+          <!-- Referencia -->
+          <div class="form-group">
+            <label>Referencia de Pago</label>
+            <input 
+              type="text" 
+              [(ngModel)]="confirmForm.payment_reference" 
+              class="form-input" 
+              placeholder="Nº transferencia, ID transacción...">
+          </div>
+
+          <!-- Notas del Pago -->
+          <div class="form-group full-width">
+            <label>Notas del Pago</label>
+            <textarea 
+              [(ngModel)]="confirmForm.payment_notes" 
+              class="form-input" 
+              rows="2" 
+              placeholder="Información adicional del pago...">
+            </textarea>
+          </div>
+        </div>
+
+        <!-- Resumen de pago -->
+        <div class="payment-summary" *ngIf="confirmItems.length > 0">
+          <div class="summary-row">
+            <span>Total del Pedido:</span>
+            <span class="summary-value">{{ formatCurrency(confirmTotal) }}</span>
+          </div>
+          <div class="summary-row" *ngIf="confirmForm.payment_status === 'partial'">
+            <span>Monto Pagado:</span>
+            <span class="summary-value">{{ formatCurrency(confirmForm.payment_amount || 0) }}</span>
+          </div>
+          <div class="summary-row highlight">
+            <span>Saldo Pendiente:</span>
+            <span class="summary-value" [class.negative]="confirmPaymentBalance > 0">
+              {{ formatCurrency(confirmPaymentBalance > 0 ? confirmPaymentBalance : 0) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notas del pedido -->
+      <div class="confirm-section" *ngIf="confirmOrder.notes">
+        <h3 class="section-title">📝 Notas del Pedido</h3>
+        <p class="notes-text">{{ confirmOrder.notes }}</p>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeConfirmModal()">
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn-primary btn-confirm" 
+        (click)="saveConfirmOrder()"
+        [disabled]="isLoading || !isConfirmFormValid()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="btn-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        {{ isLoading ? 'Confirmando...' : '✅ Confirmar Pedido' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     ORDER DETAILS MODAL (Solo lectura)
+     ========================================== -->
+<div *ngIf="showDetailsModal && selectedOrder" class="modal-overlay" (click)="closeDetailsModal()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Detalle del Pedido - {{ selectedOrder.order_number }}</h2>
+      <button class="modal-close" (click)="closeDetailsModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Order Info -->
+      <div class="order-details-header">
+        <div class="detail-item">
+          <span class="detail-label">Cliente:</span>
+          <span class="detail-value">{{ getCustomerName(selectedOrder.customer_id || '') }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Fecha:</span>
+          <span class="detail-value">{{ formatDate(selectedOrder.created_at) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Tipo:</span>
+          <span class="detail-value">{{ selectedOrder.delivery_type === 'delivery' ? '🚚 Envío' : '📦 Recoger' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Estado:</span>
+          <span class="status-badge" [class]="getStatusBadgeClass(selectedOrder.status)">
+            {{ getStatusText(selectedOrder.status) }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Origen:</span>
+          <span class="detail-value">
+            <span class="source-badge" [class]="getSourceBadgeClass(selectedOrder.source || 'manual')">
+              {{ getSourceIcon(selectedOrder.source || 'manual') }} 
+              {{ getSourceText(selectedOrder.source || 'manual') }}
+            </span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Método de Pago:</span>
+          <span class="detail-value">
+            {{ getPaymentMethodIcon(selectedOrder.payment_method || 'Efectivo') }}
+            {{ selectedOrder.payment_method || 'Sin definir' }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Estado de Pago:</span>
+          <span class="payment-status-badge" [class]="getPaymentStatusBadgeClass(selectedOrder.payment_status || 'unpaid')">
+            {{ getPaymentStatusText(selectedOrder.payment_status || 'unpaid') }}
+          </span>
+        </div>
+        <div class="detail-item" *ngIf="selectedOrder.payment_amount">
+          <span class="detail-label">Monto Pagado:</span>
+          <span class="detail-value">{{ formatCurrency(selectedOrder.payment_amount) }}</span>
+        </div>
+        <div class="detail-item" *ngIf="selectedOrder.payment_reference">
+          <span class="detail-label">Referencia:</span>
+          <span class="detail-value">{{ selectedOrder.payment_reference }}</span>
+        </div>
+        <div class="detail-item" *ngIf="selectedOrder.payment_date">
+          <span class="detail-label">Fecha de Pago:</span>
+          <span class="detail-value">{{ formatDate(selectedOrder.payment_date) }}</span>
+        </div>
+        <div class="detail-item" *ngIf="selectedOrder.delivery_type === 'delivery' && selectedOrder.delivery_address">
+          <span class="detail-label">Dirección:</span>
+          <span class="detail-value">{{ selectedOrder.delivery_address }}</span>
+        </div>
+        <div class="detail-item" *ngIf="selectedOrder.estimated_date">
+          <span class="detail-label">Entrega estimada:</span>
+          <span class="detail-value">{{ formatDate(selectedOrder.estimated_date) }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="selectedOrder.payment_notes" class="order-notes-detail">
+        <h3 class="section-title">Notas del Pago</h3>
+        <p>{{ selectedOrder.payment_notes }}</p>
+      </div>
+
+      <!-- Items -->
+      <div class="order-items-detail">
+        <h3 class="section-title">Items del Pedido</h3>
+        <div class="items-detail-list">
+          <div *ngFor="let item of selectedOrder.items" class="item-detail-row">
+            <div class="item-info">
+              <span class="item-name">{{ item.product_name }}</span>
+              <span class="item-details">{{ item.quantity }} x {{ formatCurrency(item.price) }}</span>
+            </div>
+            <span class="item-subtotal">{{ formatCurrency(item.subtotal) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="order-totals">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span>{{ formatCurrency(selectedOrder.subtotal) }}</span>
+        </div>
+        <div class="total-row">
+          <span>IVA (16%)</span>
+          <span>{{ formatCurrency(selectedOrder.tax) }}</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total</span>
+          <span>{{ formatCurrency(selectedOrder.total) }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="selectedOrder.notes" class="order-notes-detail">
+        <h3 class="section-title">Notas</h3>
+        <p>{{ selectedOrder.notes }}</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeDetailsModal()">
+        Cerrar
+      </button>
+      <!-- <button 
+        *ngIf="selectedOrder.status !== 'cancelled' && selectedOrder.payment_status !== 'paid'"
+        type="button" 
+        class="btn-primary" 
+        (click)="closeDetailsModal(); openConfirmModal(selectedOrder!)">
+        ✅ Confirmar Pedido
+      </button> -->
+    </div>
+  </div>
+</div>

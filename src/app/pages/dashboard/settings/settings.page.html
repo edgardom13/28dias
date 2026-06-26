@@ -1,0 +1,262 @@
+<div class="page-container">
+  
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Configuración</h1>
+      <p class="page-subtitle">Personaliza tu experiencia</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando configuración...</p>
+  </div>
+
+  <div *ngIf="!isLoading && settings" class="settings-content">
+    
+    <!-- Sección: Apariencia -->
+    <div class="settings-section">
+      <div class="section-header">
+        <div class="section-icon purple">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+          </svg>
+        </div>
+        <div>
+          <h3>Apariencia</h3>
+          <p>Personaliza cómo se ve la aplicación</p>
+        </div>
+      </div>
+
+      <div class="settings-list">
+        <!-- <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Modo Oscuro</span>
+            <span class="setting-description">Reduce la fatiga visual en ambientes con poca luz</span>
+          </div>
+          <label class="toggle-switch">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="settings.dark_mode"
+              (ngModelChange)="onDarkModeToggle()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div> -->
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Idioma</span>
+            <span class="setting-description">Selecciona el idioma de la interfaz</span>
+          </div>
+          <select [(ngModel)]="settings.language" class="setting-select">
+            <option *ngFor="let lang of languages" [value]="lang.value">
+              {{ lang.flag }} {{ lang.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Negocio -->
+    <div class="settings-section">
+      <div class="section-header">
+        <div class="section-icon blue">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+        <div>
+          <h3>Configuración del Negocio</h3>
+          <p>Moneda, impuestos y formatos</p>
+        </div>
+      </div>
+
+      <div class="settings-list">
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Moneda</span>
+            <span class="setting-description">Moneda utilizada en precios y reportes</span>
+          </div>
+          <select [(ngModel)]="settings.currency" class="setting-select">
+            <option *ngFor="let curr of currencies" [value]="curr.value">
+              {{ curr.symbol }} {{ curr.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">IVA / Impuesto (%)</span>
+            <span class="setting-description">Porcentaje de impuesto aplicado a las ventas</span>
+          </div>
+          <input 
+            type="number" 
+            [(ngModel)]="settings.tax_rate"
+            class="setting-input"
+            min="0"
+            max="100"
+            step="0.01"
+            style="width: 100px; text-align: center;">
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Formato de Fecha</span>
+            <span class="setting-description">Cómo se muestran las fechas en el sistema</span>
+          </div>
+          <select [(ngModel)]="settings.date_format" class="setting-select">
+            <option *ngFor="let format of dateFormats" [value]="format.value">
+              {{ format.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Formato de Hora</span>
+            <span class="setting-description">12 horas (AM/PM) o 24 horas</span>
+          </div>
+          <select [(ngModel)]="settings.time_format" class="setting-select">
+            <option value="12h">12 horas (2:30 PM)</option>
+            <option value="24h">24 horas (14:30)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Notificaciones -->
+    <div class="settings-section">
+      <div class="section-header">
+        <div class="section-icon yellow">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+        </div>
+        <div>
+          <h3>Notificaciones</h3>
+          <p>Controla qué notificaciones recibes</p>
+        </div>
+      </div>
+
+      <div class="settings-list">
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Notificaciones por Email</span>
+            <span class="setting-description">Recibe resúmenes y alertas por correo</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.email_notifications">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Notificaciones Push</span>
+            <span class="setting-description">Alertas en tiempo real en el navegador</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.push_notifications">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Sonidos de Notificación</span>
+            <span class="setting-description">Reproducir sonido al recibir alertas</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.sound_notifications">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Privacidad -->
+    <div class="settings-section">
+      <div class="section-header">
+        <div class="section-icon green">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <div>
+          <h3>Privacidad</h3>
+          <p>Datos mostrados en recibos y facturas</p>
+        </div>
+      </div>
+
+      <div class="settings-list">
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Mostrar Email en Recibos</span>
+            <span class="setting-description">Tu email aparecerá en los tickets de venta</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.show_email_in_receipts">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-label">Mostrar Teléfono en Recibos</span>
+            <span class="setting-description">Tu teléfono aparecerá en los tickets de venta</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="settings.show_phone_in_receipts">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zona de Peligro -->
+    <div class="settings-section danger-zone">
+      <div class="section-header">
+        <div class="section-icon red">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <div>
+          <h3>Zona de Peligro</h3>
+          <p>Acciones irreversibles</p>
+        </div>
+      </div>
+
+      <div class="settings-list">
+        <button class="setting-item danger" (click)="resetToDefaults()">
+          <div class="setting-info">
+            <span class="setting-label">Restablecer Configuración</span>
+            <span class="setting-description">Volver a los valores predeterminados</span>
+          </div>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="form-actions">
+      <button class="btn-secondary" (click)="loadSettings()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Cancelar
+      </button>
+      <button class="btn-primary" (click)="saveSettings()" [disabled]="isSaving">
+        <ion-spinner *ngIf="isSaving" name="crescent" class="btn-spinner"></ion-spinner>
+        <svg *ngIf="!isSaving" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        {{ isSaving ? 'Guardando...' : 'Guardar Configuración' }}
+      </button>
+    </div>
+
+  </div>
+</div>

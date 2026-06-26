@@ -1,0 +1,347 @@
+<div class="page-container">
+  
+  <!-- Header de la página -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <div>
+        <h1 class="page-title">Clientes</h1>
+        <p class="page-subtitle">Gestiona tu base de datos de clientes</p>
+      </div>
+      <div class="page-actions">
+        <div class="view-toggle">
+          <button 
+            class="toggle-btn" 
+            [class.active]="viewMode === 'grid'"
+            (click)="setViewMode('grid')"
+            title="Vista de tarjetas">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+            </svg>
+          </button>
+          <button 
+            class="toggle-btn" 
+            [class.active]="viewMode === 'table'"
+            (click)="setViewMode('table')"
+            title="Vista de tabla">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          </button>
+        </div>
+        <button class="btn-primary" (click)="openCreateModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Nuevo Cliente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Total Clientes</p>
+        <p class="stat-value">{{ totalCustomers }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Clientes Activos</p>
+        <p class="stat-value">{{ activeCustomers }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Ingresos Totales</p>
+        <p class="stat-value">{{ formatCurrency(totalRevenue) }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Búsqueda -->
+  <div class="filters-card">
+    <div class="filters-row">
+      <div class="search-box">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="filterCustomers()"
+          placeholder="Buscar clientes por nombre, email o teléfono..."
+          class="search-input"
+        >
+      </div>
+    </div>
+  </div>
+
+  <!-- VISTA GRID (CARDS) -->
+  <div class="customers-grid" *ngIf="viewMode === 'grid' && filteredCustomers.length > 0">
+    <div class="customer-card" *ngFor="let customer of filteredCustomers">
+      <div class="customer-header">
+        <div class="customer-avatar" [style.backgroundColor]="getCustomerColor(customer.id)">
+          {{ getInitials(customer.name) }}
+        </div>
+        <div class="customer-info">
+          <h3 class="customer-name">{{ customer.name }}</h3>
+          <p class="customer-email" *ngIf="customer.email">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            {{ customer.email }}
+          </p>
+          <p class="customer-phone" *ngIf="customer.phone">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+            </svg>
+            {{ customer.phone }}
+          </p>
+        </div>
+      </div>
+      
+      <div class="customer-stats">
+        <div class="stat-item">
+          <span class="stat-label">Compras</span>
+          <span class="stat-number">{{ customer.total_purchases || 0 }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Gastado</span>
+          <span class="stat-number highlight">{{ formatCurrency(customer.total_spent || 0) }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Puntos</span>
+          <span class="stat-number">{{ customer.loyalty_points || 0 }}</span>
+        </div>
+      </div>
+
+      <p class="customer-address" *ngIf="customer.address">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        {{ customer.address }}
+      </p>
+
+      <p class="customer-notes" *ngIf="customer.notes">
+        {{ customer.notes }}
+      </p>
+      
+      <div class="customer-actions">
+        <button class="btn-action edit" (click)="editCustomer(customer)" title="Editar">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          Editar
+        </button>
+        <!-- <button class="btn-action view" (click)="viewCustomerDetails(customer)" title="Ver detalles">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+          Ver
+        </button> -->
+        <button class="btn-action delete" (click)="deleteCustomer(customer)" title="Eliminar">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISTA TABLA -->
+  <div class="customers-table-container" *ngIf="viewMode === 'table' && filteredCustomers.length > 0">
+    <div class="table-wrapper">
+      <table class="customers-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Compras</th>
+            <th>Total Gastado</th>
+            <th>Puntos</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let customer of filteredCustomers">
+            <td>
+              <div class="table-customer-info">
+                <div class="table-customer-avatar" [style.backgroundColor]="getCustomerColor(customer.id)">
+                  {{ getInitials(customer.name) }}
+                </div>
+                <div class="table-customer-details">
+                  <div class="table-customer-name">{{ customer.name }}</div>
+                  <div class="table-customer-address" *ngIf="customer.address">{{ customer.address }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="table-email" *ngIf="customer.email">{{ customer.email }}</span>
+              <span class="table-no-data" *ngIf="!customer.email">—</span>
+            </td>
+            <td>
+              <span class="table-phone" *ngIf="customer.phone">{{ customer.phone }}</span>
+              <span class="table-no-data" *ngIf="!customer.phone">—</span>
+            </td>
+            <td>
+              <span class="table-purchases">{{ customer.total_purchases || 0 }}</span>
+            </td>
+            <td>
+              <span class="table-spent">{{ formatCurrency(customer.total_spent || 0) }}</span>
+            </td>
+            <td>
+              <span class="table-points">{{ customer.loyalty_points || 0 }}</span>
+            </td>
+            <td>
+              <div class="table-actions">
+                <button class="btn-action-icon edit" (click)="editCustomer(customer)" title="Editar">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </button>
+                <button class="btn-action-icon view" (click)="viewCustomerDetails(customer)" title="Ver detalles">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                </button>
+                <button class="btn-action-icon delete" (click)="deleteCustomer(customer)" title="Eliminar">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredCustomers.length === 0" class="empty-state">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+    </svg>
+    <h3>{{ searchQuery ? 'No se encontraron clientes' : 'Sin clientes' }}</h3>
+    <p>{{ searchQuery ? 'Intenta con otro término de búsqueda' : 'Comienza agregando tu primer cliente' }}</p>
+    <button *ngIf="!searchQuery" class="btn-primary" (click)="openCreateModal()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Agregar Cliente
+    </button>
+  </div>
+
+  <!-- Modal Crear/Editar Cliente -->
+  <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingCustomer ? 'Editar Cliente' : 'Nuevo Cliente' }}</h2>
+        <button class="modal-close" (click)="closeModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <form (ngSubmit)="saveCustomer()" class="modal-form">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label>Nombre Completo *</label>
+              <input 
+                type="text" 
+                [(ngModel)]="customerForm.name" 
+                name="customer_name" 
+                required 
+                class="form-input" 
+                placeholder="Ej: Juan Pérez García"
+                autofocus>
+            </div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input 
+                type="email" 
+                [(ngModel)]="customerForm.email" 
+                name="customer_email" 
+                class="form-input" 
+                placeholder="correo@ejemplo.com">
+            </div>
+
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input 
+                type="tel" 
+                [(ngModel)]="customerForm.phone" 
+                name="customer_phone" 
+                class="form-input" 
+                placeholder="+52 555 123 4567">
+            </div>
+
+            <div class="form-group full-width">
+              <label>Dirección</label>
+              <input 
+                type="text" 
+                [(ngModel)]="customerForm.address" 
+                name="customer_address" 
+                class="form-input" 
+                placeholder="Calle, número, colonia, ciudad">
+            </div>
+
+            <div class="form-group full-width">
+              <label>Notas</label>
+              <textarea 
+                [(ngModel)]="customerForm.notes" 
+                name="customer_notes" 
+                class="form-input" 
+                rows="3" 
+                placeholder="Información adicional sobre el cliente...">
+              </textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn-secondary" 
+            (click)="closeModal()" 
+            [disabled]="isLoading">
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            [disabled]="isLoading || !isFormValid">
+            {{ isLoading ? 'Guardando...' : (editingCustomer ? 'Actualizar' : 'Crear') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

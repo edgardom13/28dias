@@ -1,0 +1,113 @@
+<ion-content [fullscreen]="true" class="confirm-email-page">
+  <div class="confirm-email-layout visible">
+    
+    <!-- Lado Izquierdo: Imagen (Desktop) -->
+    <div class="confirm-email-image-side">
+      <div class="image-wrapper">
+        <img src="assets/images/store-clerk.png" 
+             alt="28DIAS" 
+             class="bg-image">
+        <div class="image-overlay"></div>
+        <div class="image-content">
+          <div class="brand-logo">
+            <span>28dias</span>
+          </div>
+          <h2 class="brand-tagline">¡Estás a un paso de comenzar!</h2>
+          <p class="brand-description">Confirma tu correo electrónico para activar tu cuenta y acceder a todas las funcionalidades</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lado Derecho: Contenido -->
+    <div class="confirm-email-form-side">
+      <div class="form-container">
+        
+        <!-- Logo Mobile -->
+        <div class="mobile-logo-section">
+          <div class="mobile-logo">
+            <div class="mobile-logo-circle">
+              <span>28dias</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Icono de correo -->
+        <div class="email-icon-container">
+          <div class="email-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Header -->
+        <div class="form-header">
+          <h1 class="form-title">¡Revisa tu correo!</h1>
+          <p class="form-subtitle">Hemos enviado un enlace de confirmación a</p>
+          <p class="email-display">{{ userEmail }}</p>
+        </div>
+
+        <!-- Instrucciones -->
+        <div class="instructions-section">
+          <div class="instruction-item">
+            <div class="instruction-number">1</div>
+            <p class="instruction-text">Abre tu bandeja de entrada</p>
+          </div>
+          <div class="instruction-item">
+            <div class="instruction-number">2</div>
+            <p class="instruction-text">Busca el correo de <strong>28Dias</strong></p>
+          </div>
+          <div class="instruction-item">
+            <div class="instruction-number">3</div>
+            <p class="instruction-text">Haz clic en el enlace de confirmación</p>
+          </div>
+          <div class="instruction-item">
+            <div class="instruction-number">4</div>
+            <p class="instruction-text">Inicia sesión para acceder a tu dashboard</p>
+          </div>
+        </div>
+
+        <!-- Advertencia spam -->
+        <div class="spam-warning">
+          <div class="warning-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <p>¿No ves el correo? Revisa tu carpeta de <strong>spam</strong> o <strong>correo no deseado</strong></p>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+          <button type="button" class="submit-button" (click)="goToLogin()">
+            Ir a Iniciar Sesión
+          </button>
+          
+          <button type="button" class="resend-button" (click)="resendEmail()" [disabled]="isResending">
+            @if (isResending) {
+              <ion-spinner name="crescent" class="btn-spinner"></ion-spinner>
+              <span>Reenviando...</span>
+            } @else {
+              <span>Reenviar correo</span>
+            }
+          </button>
+        </div>
+
+        <!-- Link de ayuda -->
+        <div class="help-section">
+          <p class="help-text">
+            ¿Problemas para confirmar? <a (click)="showHelp()" class="help-link">Contáctanos</a>
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <p>© 2024 28DIAS. Todos los derechos reservados</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ion-content>

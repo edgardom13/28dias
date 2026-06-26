@@ -1,0 +1,333 @@
+<div class="page-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <div>
+        <h1 class="page-title">Ingresos</h1>
+        <p class="page-subtitle">Gestiona los ingresos de tu negocio</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn-primary" (click)="openCreateModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Nuevo Ingreso
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Total Ingresos</p>
+        <p class="stat-value income">{{ formatCurrency(stats.totalIncome) }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Este Mes</p>
+        <p class="stat-value income">{{ formatCurrency(stats.monthIncome) }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Esta Semana</p>
+        <p class="stat-value income">{{ formatCurrency(stats.weekIncome) }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon yellow">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Hoy</p>
+        <p class="stat-value income">{{ formatCurrency(stats.todayIncome) }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Breakdown -->
+  <div class="category-breakdown" *ngIf="transactionsByCategory.length > 0">
+    <h3 class="section-title">Ingresos por Categoría</h3>
+    <div class="category-list">
+      <div *ngFor="let category of transactionsByCategory" class="category-item">
+        <div class="category-info">
+          <span class="category-name">{{ category.category }}</span>
+          <span class="category-count">{{ category.count }} transacciones</span>
+        </div>
+        <div class="category-stats">
+          <span class="category-amount">{{ formatCurrency(category.amount) }}</span>
+          <div class="category-bar">
+            <div class="category-bar-fill" [style.width.%]="getCategoryPercentage(category.category)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="filters-row">
+      <div class="search-box">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Buscar por descripción, categoría o notas..."
+          class="search-input">
+      </div>
+      
+      <div class="filter-select-wrapper">
+        <select [(ngModel)]="categoryFilter" (ngModelChange)="onFilterChange()" class="filter-select">
+          <option value="all">Todas las categorías</option>
+          <option *ngFor="let category of incomeCategories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-select-wrapper">
+        <select [(ngModel)]="dateFilter" (ngModelChange)="onFilterChange()" class="filter-select">
+          <option value="all">Todas las fechas</option>
+          <option value="today">Hoy</option>
+          <option value="week">Esta semana</option>
+          <option value="month">Este mes</option>
+          <option value="custom">Personalizado</option>
+        </select>
+      </div>
+
+      <div class="date-range" *ngIf="dateFilter === 'custom'">
+        <input 
+          type="date" 
+          [(ngModel)]="startDate"
+          (ngModelChange)="onFilterChange()"
+          class="date-input">
+        <span class="date-separator">a</span>
+        <input 
+          type="date" 
+          [(ngModel)]="endDate"
+          (ngModelChange)="onFilterChange()"
+          class="date-input">
+      </div>
+    </div>
+  </div>
+
+  <!-- Transactions Table -->
+  <div class="transactions-table-container" *ngIf="filteredTransactions.length > 0">
+    <table class="transactions-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Categoría</th>
+          <th>Método</th>
+          <th>Referencia</th>
+          <th>Monto</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let transaction of filteredTransactions">
+          <td>
+            <div class="date-cell">
+              <div class="date-main">{{ formatDate(transaction.transaction_date) }}</div>
+            </div>
+          </td>
+          <td>
+            <div class="description-cell">
+              <div class="description-main">{{ transaction.description }}</div>
+              <div class="description-notes" *ngIf="transaction.notes">{{ transaction.notes }}</div>
+            </div>
+          </td>
+          <td>
+            <span class="category-badge">{{ transaction.category }}</span>
+          </td>
+          <td>
+            <span class="payment-method">
+              {{ getPaymentMethodIcon(transaction.payment_method) }}
+              {{ getPaymentMethodName(transaction.payment_method) }}
+            </span>
+          </td>
+          <td>
+            <span class="reference-number" *ngIf="transaction.reference_number">
+              {{ transaction.reference_number }}
+            </span>
+            <span *ngIf="!transaction.reference_number" class="no-reference">—</span>
+          </td>
+          <td>
+            <span class="amount-cell income">{{ formatCurrency(transaction.amount) }}</span>
+          </td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-action edit" (click)="editTransaction(transaction)" title="Editar">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <button class="btn-action delete" (click)="deleteTransaction(transaction)" title="Eliminar">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredTransactions.length === 0 && !isLoading" class="empty-state">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <h3>{{ searchQuery ? 'No se encontraron ingresos' : 'Sin ingresos registrados' }}</h3>
+    <p>{{ searchQuery ? 'Intenta con otro término de búsqueda' : 'Comienza registrando tu primer ingreso' }}</p>
+    <button *ngIf="!searchQuery" class="btn-primary" (click)="openCreateModal()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Registrar Ingreso
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando...</p>
+  </div>
+
+  <!-- Create/Edit Modal -->
+  <div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingTransaction ? 'Editar Ingreso' : 'Nuevo Ingreso' }}</h2>
+        <button class="modal-close" (click)="closeModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Category -->
+        <div class="form-group full-width">
+          <label>Categoría *</label>
+          <select [(ngModel)]="transactionForm.category" class="form-input" required>
+            <option *ngFor="let category of incomeCategories" [value]="category">
+              {{ category }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group full-width">
+          <label>Monto *</label>
+          <input 
+            type="number" 
+            [(ngModel)]="transactionForm.amount" 
+            class="form-input amount-input" 
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            required>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group full-width">
+          <label>Descripción *</label>
+          <input 
+            type="text" 
+            [(ngModel)]="transactionForm.description" 
+            class="form-input" 
+            placeholder="Ej: Venta de producto, Servicio de consultoría"
+            required>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="form-group full-width">
+          <label>Método de Pago</label>
+          <div class="payment-method-options">
+            <label 
+              *ngFor="let method of paymentMethods" 
+              class="payment-method-option" 
+              [class.active]="transactionForm.payment_method === method.id">
+              <input type="radio" [(ngModel)]="transactionForm.payment_method" [value]="method.id">
+              <span>{{ method.icon }} {{ method.name }}</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Transaction Date -->
+        <div class="form-group full-width">
+          <label>Fecha</label>
+          <input 
+            type="date" 
+            [(ngModel)]="transactionForm.transaction_date" 
+            class="form-input">
+        </div>
+
+        <!-- Reference Number -->
+        <div class="form-group full-width">
+          <label>Número de Referencia</label>
+          <input 
+            type="text" 
+            [(ngModel)]="transactionForm.reference_number" 
+            class="form-input" 
+            placeholder="Ej: FACT-001, REC-123">
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group full-width">
+          <label>Notas</label>
+          <textarea 
+            [(ngModel)]="transactionForm.notes" 
+            class="form-input" 
+            rows="3" 
+            placeholder="Notas adicionales...">
+          </textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn-primary" 
+          (click)="saveTransaction()"
+          [disabled]="isLoading || !transactionForm.description || transactionForm.amount <= 0">
+          {{ isLoading ? 'Guardando...' : (editingTransaction ? 'Actualizar' : 'Registrar') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

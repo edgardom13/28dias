@@ -1,0 +1,430 @@
+<!-- ==========================================
+     POS CONTAINER
+     ========================================== -->
+<div class="pos-container">
+  
+  <!-- HEADER SUPERIOR -->
+  <div class="pos-top-header">
+    <div class="pos-header-content">
+      <div>
+        <h1 class="pos-page-title">Nueva Venta</h1>
+        <p class="pos-page-subtitle">Punto de venta</p>
+      </div>
+      
+      <div class="pos-header-actions">
+        <div class="view-toggle">
+          <button 
+            class="toggle-btn" 
+            [class.active]="viewMode === 'grid'"
+            (click)="setViewMode('grid')"
+            title="Vista de productos">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+            </svg>
+          </button>
+          <button 
+            class="toggle-btn" 
+            [class.active]="viewMode === 'table'"
+            (click)="setViewMode('table')"
+            title="Vista de tabla">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          </button>
+        </div>
+
+        <button class="btn-clear-cart" (click)="clearCart()" *ngIf="cart.length > 0">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+          <span>Vaciar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT AREA -->
+  <div class="pos-main-content">
+    
+    <!-- Search & Filters -->
+    <div class="pos-filters-section">
+      <div class="pos-search-box">
+        <svg class="pos-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="searchProducts()"
+          placeholder="Buscar producto por nombre o SKU..."
+          class="pos-search-input"
+        >
+      </div>
+
+      <div class="pos-categories-scroll">
+        <button 
+          class="pos-category-chip" 
+          [class.active]="!selectedCategory"
+          (click)="filterByCategory(null)" style="color: black;">
+          Todos
+        </button>
+        <button 
+          *ngFor="let category of filteredCategories"
+          class="pos-category-chip" 
+          [class.active]="selectedCategory === category.id"
+          (click)="filterByCategory(category.id)"
+          [style.backgroundColor]="selectedCategory === category.id ? category.color : ''">
+          {{ category.name }}
+        </button>
+      </div>
+    </div>
+
+    <!-- PRODUCTS GRID VIEW -->
+    <div class="products-grid-container" *ngIf="viewMode === 'grid' && !isLoading">
+      <div class="products-grid">
+        <div 
+          *ngFor="let product of filteredProducts"
+          class="product-card"
+          [class.in-cart]="getCartQuantity(product.id) > 0">
+          
+          <div class="cart-badge" *ngIf="getCartQuantity(product.id) > 0">
+            {{ getCartQuantity(product.id) }}
+          </div>
+
+          <div class="product-image" [style.background]="product.color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'">
+            <img *ngIf="product.image" [src]="product.image" [alt]="product.name" class="product-img">
+            <svg *ngIf="!product.image" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+          </div>
+
+          <div class="product-card-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-sku" *ngIf="product.sku">SKU: {{ product.sku }}</p>
+            <div class="product-footer">
+              <p class="product-price">{{ formatCurrency(product.price) }}</p>
+              <p class="product-stock" [class.low]="product.stock < 10">
+                Stock: {{ product.stock }}
+              </p>
+            </div>
+          </div>
+
+          <div class="quantity-controls" (click)="$event.stopPropagation()">
+            <button 
+              class="qty-btn minus"
+              (click)="updateQuantity(product.id, getCartQuantity(product.id) - 1)"
+              [disabled]="getCartQuantity(product.id) === 0">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+              </svg>
+            </button>
+            <span class="qty-display">{{ getCartQuantity(product.id) }}</span>
+            <button 
+              class="qty-btn plus"
+              (click)="addToCart(product)">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS TABLE VIEW -->
+    <div class="products-table-container" *ngIf="viewMode === 'table' && !isLoading">
+      <div class="table-wrapper">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>SKU</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Cantidad</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of filteredProducts" class="table-row" [class.in-cart]="getCartQuantity(product.id) > 0">
+              <td>
+                <div class="table-product-info">
+                  <div class="table-product-image" [style.background]="product.color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'">
+                    <img *ngIf="product.image" [src]="product.image" [alt]="product.name">
+                    <svg *ngIf="!product.image" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                  </div>
+                  <div class="table-product-name">{{ product.name }}</div>
+                </div>
+              </td>
+              <td class="table-sku">{{ product.sku || '-' }}</td>
+              <td class="table-price">{{ formatCurrency(product.price) }}</td>
+              <td>
+                <span class="table-stock" [class.low]="product.stock < 10">
+                  {{ product.stock }}
+                </span>
+              </td>
+              <td>
+                <div class="table-quantity-control" (click)="$event.stopPropagation()">
+                  <button 
+                    class="qty-btn-table"
+                    (click)="updateQuantity(product.id, getCartQuantity(product.id) - 1)"
+                    [disabled]="getCartQuantity(product.id) === 0">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                    </svg>
+                  </button>
+                  <span class="qty-display-table">{{ getCartQuantity(product.id) }}</span>
+                  <button 
+                    class="qty-btn-table add"
+                    (click)="addToCart(product)">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+              <td>
+                <button 
+                  class="btn-add-to-cart"
+                  (click)="addToCart(product)">
+                  Agregar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <p>Cargando productos...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && filteredProducts.length === 0">
+      <div class="empty-icon">📦</div>
+      <h3>No se encontraron productos</h3>
+      <p>Intenta con otra búsqueda o categoría</p>
+    </div>
+  </div>
+
+  <!-- FLOATING CART BUTTON -->
+  <button 
+    *ngIf="cart.length > 0"
+    class="floating-cart-btn"
+    (click)="openCartModal()">
+    <div class="cart-icon-wrapper">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+      </svg>
+      <span class="cart-badge">{{ cartItemsCount }}</span>
+    </div>
+    <span class="cart-total">{{ formatCurrency(total) }}</span>
+  </button>
+
+</div>
+
+<!-- ==========================================
+     MODALS - FUERA DEL CONTAINER PRINCIPAL
+     ========================================== -->
+
+<!-- CART & PAYMENT MODAL -->
+<div *ngIf="showCartModal" class="modal-overlay" (click)="closeCartModal()">
+  <div class="modal-content cart-payment-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        Carrito y Pago
+      </h2>
+      <button class="modal-close" (click)="closeCartModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="cart-section-modal">
+        <h3 class="section-title">Productos ({{ cartItemsCount }})</h3>
+        
+        <div class="cart-items-modal" *ngIf="cart.length > 0">
+          <div *ngFor="let item of cart" class="cart-item-modal">
+            <div class="item-info-modal">
+              <h4 class="item-name-modal">{{ item.product.name }}</h4>
+              <p class="item-price-modal">{{ formatCurrency(item.product.price) }} c/u</p>
+            </div>
+            <div class="item-actions-modal">
+              <div class="quantity-control-modal">
+                <button (click)="updateQuantity(item.product.id, item.quantity - 1)" class="qty-btn-modal">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                  </svg>
+                </button>
+                <input 
+                  type="number" 
+                  [value]="item.quantity"
+                  (change)="onQuantityChange(item.product.id, $event)"
+                  class="qty-input-modal">
+                <button (click)="updateQuantity(item.product.id, item.quantity + 1)" class="qty-btn-modal">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="item-subtotal-modal">
+                {{ formatCurrency(item.subtotal) }}
+              </div>
+              <button (click)="removeFromCart(item.product.id)" class="remove-btn-modal">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="payment-section-modal">
+        <h3 class="section-title">Método de Pago</h3>
+        
+        <div class="payment-total-modal">
+          <div class="total-row-modal">
+            <span>Subtotal</span>
+            <span>{{ formatCurrency(subtotal) }}</span>
+          </div>
+          <div class="total-row-modal">
+            <span>IVA (16%)</span>
+            <span>{{ formatCurrency(tax) }}</span>
+          </div>
+          <div class="total-row-modal grand-total">
+            <span>Total</span>
+            <span class="total-amount-modal">{{ formatCurrency(total) }}</span>
+          </div>
+        </div>
+
+        <div class="payment-methods-modal">
+          <div class="methods-grid-modal">
+            <button 
+              *ngFor="let method of paymentMethods"
+              class="method-card-modal"
+              [class.active]="paymentMethod === method.id"
+              (click)="paymentMethod = method.id">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path *ngIf="method.id === 'cash'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                <path *ngIf="method.id === 'card'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                <path *ngIf="method.id === 'transfer'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                <path *ngIf="method.id === 'mixed'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              <span>{{ method.name }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="payment-input-modal" *ngIf="paymentMethod === 'cash'">
+          <label class="form-label-modal">Efectivo recibido</label>
+          <input 
+            type="number" 
+            [(ngModel)]="cashReceived"
+            (ngModelChange)="calculateChange()"
+            class="form-input-modal"
+            placeholder="0.00"
+            min="0"
+            step="0.01">
+          <div class="change-display-modal" *ngIf="cashReceived > 0">
+            <span>Cambio:</span>
+            <span [class.negative]="change < 0">{{ formatCurrency(change) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeCartModal()">
+        Seguir comprando
+      </button>
+      <button 
+        class="btn-primary" 
+        (click)="processPayment()"
+        [disabled]="isLoading || (paymentMethod === 'cash' && cashReceived < total)">
+        {{ isLoading ? 'Procesando...' : 'Confirmar Pago' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div *ngIf="showReceiptModal" class="modal-overlay" (click)="closeReceiptModal()">
+  <div class="modal-content receipt-modal" (click)="$event.stopPropagation()">
+    <div class="receipt-header">
+      <div class="success-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h2>¡Venta Completada!</h2>
+      <p class="receipt-number">{{ lastReceipt?.receipt_number }}</p>
+    </div>
+
+    <div class="receipt-body" *ngIf="lastReceipt">
+      <div class="receipt-info">
+        <p><strong>Fecha:</strong> {{ formatDate(lastReceipt.date) }}</p>
+        <p><strong>Método de pago:</strong> {{ getPaymentMethodName(lastReceipt.payment_method) }}</p>
+      </div>
+
+      <div class="receipt-items">
+        <div *ngFor="let item of lastReceipt.items" class="receipt-item">
+          <div>
+            <span class="item-qty">{{ item.quantity }}x</span>
+            <span class="item-name">{{ item.product?.name || 'Producto' }}</span>
+          </div>
+          <span class="item-price">{{ formatCurrency(item.subtotal) }}</span>
+        </div>
+      </div>
+
+      <div class="receipt-totals">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span>{{ formatCurrency(lastReceipt.subtotal) }}</span>
+        </div>
+        <div class="total-row">
+          <span>IVA</span>
+          <span>{{ formatCurrency(lastReceipt.tax) }}</span>
+        </div>
+        <div class="total-row grand-total">
+          <span>Total</span>
+          <span>{{ formatCurrency(lastReceipt.total) }}</span>
+        </div>
+        <div class="total-row" *ngIf="lastReceipt.payment_method === 'cash'">
+          <span>Efectivo</span>
+          <span>{{ formatCurrency(lastReceipt.cash_received) }}</span>
+        </div>
+        <div class="total-row" *ngIf="lastReceipt.payment_method === 'cash'">
+          <span>Cambio</span>
+          <span>{{ formatCurrency(lastReceipt.change) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="receipt-footer">
+      <button class="btn-secondary" (click)="printReceipt()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+        </svg>
+        Imprimir
+      </button>
+      <button class="btn-primary" (click)="closeReceiptModal()">
+        Nueva Venta
+      </button>
+    </div>
+  </div>
+</div>

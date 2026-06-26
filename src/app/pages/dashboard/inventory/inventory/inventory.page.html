@@ -1,0 +1,499 @@
+<div class="page-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <div>
+        <h1 class="page-title">Inventario</h1>
+        <p class="page-subtitle">Control avanzado de stock y movimientos</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn-primary" (click)="openMovementModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Registrar Movimiento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Total Productos</p>
+        <p class="stat-value">{{ stats.totalProducts }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Unidades en Stock</p>
+        <p class="stat-value">{{ stats.totalStock }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Valor del Inventario</p>
+        <p class="stat-value">{{ formatCurrency(stats.totalValue) }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon yellow">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Stock Bajo</p>
+        <p class="stat-value">{{ stats.lowStock }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon red">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Sin Stock</p>
+        <p class="stat-value">{{ stats.outOfStock }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon red">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Stock Crítico</p>
+        <p class="stat-value">{{ stats.criticalStock }}</p>
+      </div>
+    </div>
+  </div>
+
+ <!-- Filters -->
+<div class="filters-card">
+  <div class="filters-row">
+    <div class="search-box">
+      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onFilterChange()"
+        placeholder="Buscar productos por nombre o SKU..."
+        class="search-input">
+    </div>
+    
+    <div class="filter-select-wrapper">
+      <select [(ngModel)]="selectedCategory" (ngModelChange)="onFilterChange()" class="filter-select">
+        <option value="all">Todas las categorías</option>
+        <option *ngFor="let category of categories" [value]="category.id">
+          {{ category.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-select-wrapper">
+      <select [(ngModel)]="stockFilter" (ngModelChange)="onFilterChange()" class="filter-select">
+        <option value="all">Todo el stock</option>
+        <option value="available">Disponible (&gt;5)</option>
+        <option value="low">Stock bajo (1-5)</option>
+        <option value="critical">Stock crítico (1-3)</option>
+        <option value="out">Sin stock</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+  <!-- Products Table -->
+  <div class="inventory-table-container" *ngIf="filteredProducts.length > 0">
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>SKU</th>
+          <th>Categoría</th>
+          <th>Stock</th>
+          <th>Estado</th>
+          <th>Precio</th>
+          <th>Valor</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of filteredProducts" [class.low-stock-row]="getStockStatus(product.stock || 0) === 'low'" [class.critical-stock-row]="getStockStatus(product.stock || 0) === 'critical'" [class.out-stock-row]="getStockStatus(product.stock || 0) === 'out'">
+          <td>
+            <div class="table-product">
+              <div class="table-product-image">
+                <img *ngIf="product.image" [src]="product.image" [alt]="product.name">
+                <div *ngIf="!product.image" class="table-product-placeholder">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="table-product-info">
+                <h4 class="table-product-name">{{ product.name }}</h4>
+                <p class="table-product-description" *ngIf="product.description">{{ product.description }}</p>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="table-sku">{{ product.sku || '—' }}</span>
+          </td>
+          <td>
+            <span class="table-category">{{ getCategoryName(product.category_id || '') }}</span>
+          </td>
+          <td>
+            <div class="table-stock">
+              <span class="stock-value">{{ product.stock || 0 }}</span>
+              <span class="stock-unit">unidades</span>
+            </div>
+          </td>
+          <td>
+            <span class="stock-status-badge" [class]="getStockStatus(product.stock || 0)">
+              {{ getStockStatusLabel(product.stock || 0) }}
+            </span>
+          </td>
+          <td>
+            <div class="table-price">
+              <span class="price-main">{{ formatCurrency(product.price) }}</span>
+              <span class="price-cost" *ngIf="product.cost">Costo: {{ formatCurrency(product.cost) }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="table-value">{{ formatCurrency((product.stock || 0) * (product.cost || product.price)) }}</span>
+          </td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-action add" (click)="openMovementModal(product)" title="Agregar stock">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+              </button>
+              <button class="btn-action history" (click)="viewProductHistory(product)" title="Ver historial">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredProducts.length === 0 && !isLoading" class="empty-state">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+    </svg>
+    <h3>{{ searchQuery ? 'No se encontraron productos' : 'Sin productos en inventario' }}</h3>
+    <p>{{ searchQuery ? 'Intenta con otro término de búsqueda' : 'Comienza agregando productos a tu inventario' }}</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando inventario...</p>
+  </div>
+
+  <!-- Movement Modal -->
+  <div *ngIf="showMovementModal" class="modal-overlay" (click)="closeMovementModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Registrar Movimiento de Inventario</h2>
+        <button class="modal-close" (click)="closeMovementModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- ✅ NUEVO: Product Selection con búsqueda -->
+          <div class="form-group full-width product-search-group">
+            <label>Producto *</label>
+            <div class="product-search-container">
+              <div class="product-search-input-wrapper">
+                <svg class="search-icon-small" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input 
+                  type="text"
+                  [(ngModel)]="productSearchQuery"
+                  (ngModelChange)="onFilterChange()"
+                  (focus)="onProductSearchFocus()"
+                  (blur)="onProductSearchBlur()"
+                  class="form-input product-search-input"
+                  placeholder="Escribe para buscar producto..."
+                  autocomplete="off">
+                <button 
+                  *ngIf="productSearchQuery" 
+                  type="button"
+                  class="clear-search-btn"
+                  (mousedown)="$event.preventDefault(); clearProductSelection()">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Dropdown de resultados -->
+              <div class="product-dropdown" *ngIf="showProductDropdown">
+                <div 
+                  *ngFor="let product of filteredProductsForSelect" 
+                  class="product-dropdown-item"
+                  [class.selected]="movementForm.product_id === product.id"
+                  (mousedown)="$event.preventDefault(); selectProductForMovement(product)">
+                  <div class="product-dropdown-info">
+                    <span class="product-dropdown-name">{{ product.name }}</span>
+                    <span class="product-dropdown-sku" *ngIf="product.sku">SKU: {{ product.sku }}</span>
+                  </div>
+                  <span class="product-dropdown-stock" [class.low]="product.stock <= 5" [class.out]="product.stock === 0">
+                    Stock: {{ product.stock || 0 }}
+                  </span>
+                </div>
+                <div *ngIf="filteredProductsForSelect.length === 0" class="product-dropdown-empty">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <p>No se encontraron productos</p>
+                </div>
+                <div *ngIf="filteredProductsForSelect.length >= 50" class="product-dropdown-hint">
+                  Mostrando primeros 50 resultados. Escribe para filtrar.
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        <!-- Movement Type -->
+        <div class="form-group full-width">
+          <label>Tipo de Movimiento *</label>
+          <div class="movement-type-options">
+            <label class="movement-type-option" [class.active]="movementForm.movement_type === 'in'">
+              <input type="radio" [(ngModel)]="movementForm.movement_type" value="in">
+              <div class="movement-type-content">
+                <span class="movement-icon">📥</span>
+                <span class="movement-label">Entrada</span>
+                <span class="movement-desc">Compra, recepción</span>
+              </div>
+            </label>
+            <label class="movement-type-option" [class.active]="movementForm.movement_type === 'out'">
+              <input type="radio" [(ngModel)]="movementForm.movement_type" value="out">
+              <div class="movement-type-content">
+                <span class="movement-icon">📤</span>
+                <span class="movement-label">Salida</span>
+                <span class="movement-desc">Venta, consumo</span>
+              </div>
+            </label>
+            <label class="movement-type-option" [class.active]="movementForm.movement_type === 'adjustment'">
+              <input type="radio" [(ngModel)]="movementForm.movement_type" value="adjustment">
+              <div class="movement-type-content">
+                <span class="movement-icon">⚙️</span>
+                <span class="movement-label">Ajuste</span>
+                <span class="movement-desc">Merma, daño, corrección</span>
+              </div>
+            </label>
+            <label class="movement-type-option" [class.active]="movementForm.movement_type === 'return'">
+              <input type="radio" [(ngModel)]="movementForm.movement_type" value="return">
+              <div class="movement-type-content">
+                <span class="movement-icon">🔄</span>
+                <span class="movement-label">Devolución</span>
+                <span class="movement-desc">De cliente o proveedor</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Quantity -->
+        <div class="form-group full-width">
+          <label>Cantidad *</label>
+          <input 
+            type="number" 
+            [(ngModel)]="movementForm.quantity" 
+            class="form-input" 
+            min="1"
+            placeholder="Cantidad"
+            required>
+          <p class="form-help" *ngIf="getSelectedProduct()">
+            Stock actual: <strong>{{ getSelectedProduct()?.stock || 0 }}</strong> → 
+            Nuevo stock: <strong>
+              {{ 
+                movementForm.movement_type === 'in' || movementForm.movement_type === 'return' 
+                  ? (getSelectedProduct()?.stock || 0) + movementForm.quantity 
+                  : movementForm.movement_type === 'out' 
+                    ? (getSelectedProduct()?.stock || 0) - movementForm.quantity 
+                    : movementForm.quantity 
+              }}
+            </strong>
+          </p>
+        </div>
+
+        <!-- Reason -->
+        <div class="form-group full-width">
+          <label>Razón del Movimiento</label>
+          <select [(ngModel)]="movementForm.reason" class="form-input">
+            <option value="">Selecciona una razón</option>
+            <option *ngIf="movementForm.movement_type === 'in'" value="purchase">Compra a proveedor</option>
+            <option *ngIf="movementForm.movement_type === 'in'" value="transfer">Transferencia de sucursal</option>
+            <option *ngIf="movementForm.movement_type === 'in'" value="production">Producción propia</option>
+            <option *ngIf="movementForm.movement_type === 'out'" value="sale">Venta</option>
+            <option *ngIf="movementForm.movement_type === 'out'" value="consumption">Consumo interno</option>
+            <option *ngIf="movementForm.movement_type === 'out'" value="donation">Donación</option>
+            <option *ngIf="movementForm.movement_type === 'adjustment'" value="damage">Producto dañado</option>
+            <option *ngIf="movementForm.movement_type === 'adjustment'" value="expiration">Producto vencido</option>
+            <option *ngIf="movementForm.movement_type === 'adjustment'" value="theft">Robo/pérdida</option>
+            <option *ngIf="movementForm.movement_type === 'adjustment'" value="correction">Corrección de inventario</option>
+            <option *ngIf="movementForm.movement_type === 'return'" value="customer_return">Devolución de cliente</option>
+            <option *ngIf="movementForm.movement_type === 'return'" value="supplier_return">Devolución a proveedor</option>
+          </select>
+        </div>
+
+        <!-- Reference Number -->
+        <div class="form-group full-width">
+          <label>Número de Referencia</label>
+          <input 
+            type="text" 
+            [(ngModel)]="movementForm.reference_number" 
+            class="form-input" 
+            placeholder="Ej: OC-12345, FACT-001">
+        </div>
+
+        <!-- Cost per Unit -->
+        <div class="form-group full-width">
+          <label>Costo por Unidad</label>
+          <input 
+            type="number" 
+            [(ngModel)]="movementForm.cost_per_unit" 
+            class="form-input" 
+            min="0"
+            step="0.01"
+            placeholder="0.00">
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group full-width">
+          <label>Notas</label>
+          <textarea 
+            [(ngModel)]="movementForm.notes" 
+            class="form-input" 
+            rows="3" 
+            placeholder="Notas adicionales sobre el movimiento...">
+          </textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeMovementModal()">
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn-primary" 
+          (click)="saveMovement()"
+          [disabled]="isLoading || !movementForm.product_id || movementForm.quantity <= 0">
+          {{ isLoading ? 'Registrando...' : 'Registrar Movimiento' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Modal -->
+  <div *ngIf="showHistoryModal && selectedProduct" class="modal-overlay" (click)="closeHistoryModal()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Historial de {{ selectedProduct.name }}</h2>
+        <button class="modal-close" (click)="closeHistoryModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="product-summary">
+          <div class="summary-item">
+            <span class="summary-label">Stock Actual:</span>
+            <span class="summary-value">{{ selectedProduct.stock || 0 }} unidades</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Total Movimientos:</span>
+            <span class="summary-value">{{ productMovements.length }}</span>
+          </div>
+        </div>
+
+        <div class="movements-list" *ngIf="productMovements.length > 0">
+          <div *ngFor="let movement of productMovements" class="movement-item" [class]="getMovementTypeClass(movement.movement_type)">
+            <div class="movement-icon-wrapper">
+              <span class="movement-emoji" *ngIf="movement.movement_type === 'in'">📥</span>
+              <span class="movement-emoji" *ngIf="movement.movement_type === 'out'">📤</span>
+              <span class="movement-emoji" *ngIf="movement.movement_type === 'adjustment'">⚙️</span>
+              <span class="movement-emoji" *ngIf="movement.movement_type === 'return'">🔄</span>
+            </div>
+            <div class="movement-info">
+              <div class="movement-header">
+                <span class="movement-type-badge" [class]="getMovementTypeClass(movement.movement_type)">
+                  {{ getMovementTypeLabel(movement.movement_type) }}
+                </span>
+                <span class="movement-date">{{ formatDate(movement.created_at) }}</span>
+              </div>
+              <div class="movement-details">
+                <span class="movement-quantity">
+                  {{ movement.movement_type === 'in' || movement.movement_type === 'return' ? '+' : movement.movement_type === 'out' ? '-' : '=' }}
+                  {{ movement.quantity }} unidades
+                </span>
+                <span class="movement-stock-change">
+                  {{ movement.previous_stock }} → {{ movement.new_stock }}
+                </span>
+              </div>
+              <div class="movement-reason" *ngIf="movement.reason">
+                Razón: {{ movement.reason }}
+              </div>
+              <div class="movement-notes" *ngIf="movement.notes">
+                {{ movement.notes }}
+              </div>
+              <div class="movement-meta" *ngIf="movement.reference_number || movement.total_cost">
+                <span *ngIf="movement.reference_number">Ref: {{ movement.reference_number }}</span>
+                <span *ngIf="movement.total_cost">| Costo: {{ formatCurrency(movement.total_cost) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="productMovements.length === 0" class="no-movements">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p>Sin movimientos registrados</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,131 @@
+<ion-content [fullscreen]="true" class="business-page">
+  <div class="business-layout visible">
+    
+    <!-- Lado Izquierdo: Imagen (Desktop) -->
+    <div class="business-image-side">
+      <div class="image-wrapper">
+        <img src="assets/images/store-clerk.png" 
+             alt="28DIAS" 
+             class="bg-image">
+        <div class="image-overlay"></div>
+        <div class="image-content">
+          <div class="brand-logo">
+            <span>28dias</span>
+          </div>
+          <h2 class="brand-tagline">Impulsa tu negocio al siguiente nivel</h2>
+          <p class="brand-description">Personaliza tu experiencia y descubre las herramientas ideales para tu tipo de comercio</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lado Derecho: Formulario -->
+    <div class="business-form-side">
+      <div class="form-container">
+        
+        <!-- Logo Mobile -->
+        <div class="mobile-logo-section">
+          <div class="mobile-logo">
+            <div class="mobile-logo-circle">
+              <span>28dias</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Header -->
+        <div class="form-header">
+          <h1 class="form-title">Configura tu negocio</h1>
+          <p class="form-subtitle">Cuéntanos sobre tu negocio para personalizar tu experiencia</p>
+        </div>
+
+        <!-- Formulario -->
+        <form [formGroup]="businessForm" (ngSubmit)="onContinue()" class="business-form">
+          
+          <!-- Nombre del Negocio -->
+          <div class="form-group">
+            <label class="form-label">Nombre de tu negocio</label>
+            <div class="input-container" [class.has-error]="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.errors">
+              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+              <input 
+                type="text" 
+                formControlName="businessName"
+                placeholder="Ej: Mi Tienda 28"
+                class="form-input"
+                autocomplete="off">
+            </div>
+            @if (businessForm.get('businessName')?.touched && businessForm.get('businessName')?.errors) {
+              <div class="error-text">
+                @if (businessForm.get('businessName')?.errors?.['required']) {
+                  <span>El nombre del negocio es requerido</span>
+                }
+                @if (businessForm.get('businessName')?.errors?.['minlength']) {
+                  <span>El nombre debe tener al menos 3 caracteres</span>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Tipo de Negocio -->
+          <div class="form-group">
+            <label class="form-label">¿Qué tipo de negocio tienes?</label>
+            <div class="business-grid">
+              @for (business of businessTypes; track business.id) {
+                <button 
+                  type="button"
+                  class="business-card"
+                  [class.selected]="selectedBusiness === business.id"
+                  (click)="selectBusiness(business.id)">
+                  <div class="business-icon">
+                    <i class="bi {{ business.icon }}"></i>
+                  </div>
+                  <span class="business-name">{{ business.name }}</span>
+                </button>
+              }
+            </div>
+            
+            @if (businessForm.touched && !selectedBusiness) {
+              <div class="error-text">
+                <span>Selecciona un tipo de negocio</span>
+              </div>
+            }
+          </div>
+
+          <!-- Botón Submit -->
+          <button 
+            type="submit" 
+            class="submit-button"
+            [disabled]="businessForm.invalid || !selectedBusiness || isLoading">
+            @if (isLoading) {
+              <ion-spinner name="crescent" class="btn-spinner"></ion-spinner>
+              <span>Guardando información...</span>
+            } @else {
+              <span>Continuar al Plan</span>
+            }
+          </button>
+
+        </form>
+
+        <!-- Info adicional -->
+        <div class="info-section">
+          <div class="info-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <p class="info-text">
+            Esta información nos ayuda a personalizar tu tienda virtual y ofrecerte las mejores herramientas para tu tipo de negocio.
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <p>© 2024 28DIAS. Todos los derechos reservados</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ion-content>

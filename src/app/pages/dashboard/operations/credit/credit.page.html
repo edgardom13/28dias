@@ -1,0 +1,553 @@
+<div class="page-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <div>
+        <h1 class="page-title">Fiado</h1>
+        <p class="page-subtitle">Gestiona las ventas a crédito</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn-primary" (click)="openCreateModal()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Nuevo Fiado
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Total Fiados</p>
+        <p class="stat-value">{{ stats.totalCredits }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Total Fiado</p>
+        <p class="stat-value">{{ formatCurrency(stats.totalAmount) }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon yellow">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Por Cobrar</p>
+        <p class="stat-value">{{ formatCurrency(stats.pendingAmount) }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Cobrado</p>
+        <p class="stat-value">{{ formatCurrency(stats.paidAmount) }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon red">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Vencidos</p>
+        <p class="stat-value">{{ stats.overdueCount }}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon red">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <p class="stat-label">Monto Vencido</p>
+        <p class="stat-value">{{ formatCurrency(stats.overdueAmount) }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="filters-row">
+      <div class="search-box">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Buscar por nombre de cliente o notas..."
+          class="search-input">
+      </div>
+      
+      <div class="filter-select-wrapper">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()" class="filter-select">
+          <option value="all">Todos los estados</option>
+          <option value="pending">Pendientes</option>
+          <option value="partial">Parciales</option>
+          <option value="paid">Pagados</option>
+          <option value="overdue">Vencidos</option>
+          <option value="cancelled">Cancelados</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Credits Table -->
+  <div class="credits-table-container" *ngIf="filteredCredits.length > 0">
+    <table class="credits-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Total</th>
+          <th>Abonado</th>
+          <th>Restante</th>
+          <th>Vence</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let credit of filteredCredits" 
+            [class.overdue-row]="isOverdue(credit)"
+            [class.paid-row]="credit.status === 'paid'">
+          <td>
+            <div class="customer-info-cell">
+              <div class="customer-avatar-small" [style.backgroundColor]="getCustomerColor(credit.customer_id || credit.id)">
+                {{ getInitials(credit.customer_name) }}
+              </div>
+              <div>
+                <div class="customer-name-cell">{{ credit.customer_name }}</div>
+                <div class="customer-notes-cell" *ngIf="credit.notes">{{ credit.notes }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ formatDate(credit.created_at) }}</td>
+          <td class="amount-cell">{{ formatCurrency(credit.total_amount) }}</td>
+          <td class="amount-cell paid-amount">{{ formatCurrency(credit.paid_amount) }}</td>
+          <td class="amount-cell remaining-amount">{{ formatCurrency(credit.remaining_amount) }}</td>
+          <td>
+            <span *ngIf="credit.due_date" [class.overdue-date]="isOverdue(credit)">
+              {{ formatDate(credit.due_date) }}
+            </span>
+            <span *ngIf="!credit.due_date" class="no-date">Sin fecha</span>
+          </td>
+          <td>
+            <div class="status-wrapper">
+              <span class="status-badge" [class]="getStatusBadgeClass(credit.status)">
+                {{ getStatusText(credit.status) }}
+              </span>
+              <div class="progress-bar-mini" *ngIf="credit.status !== 'cancelled'">
+                <div class="progress-fill-mini" [style.width.%]="getProgressPercentage(credit)"></div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-action view" (click)="viewCreditDetails(credit)" title="Ver detalles">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              </button>
+              <button 
+                class="btn-action pay" 
+                (click)="openPaymentModal(credit)" 
+                [disabled]="credit.status === 'paid' || credit.status === 'cancelled'"
+                title="Registrar abono">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </button>
+              <button 
+                class="btn-action cancel" 
+                (click)="cancelCredit(credit)" 
+                [disabled]="credit.status === 'paid' || credit.status === 'cancelled'"
+                title="Cancelar">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+              <button class="btn-action delete" (click)="deleteCredit(credit)" title="Eliminar">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredCredits.length === 0 && !isLoading" class="empty-state">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+    </svg>
+    <h3>{{ searchQuery ? 'No se encontraron fiados' : 'Sin fiados registrados' }}</h3>
+    <p>{{ searchQuery ? 'Intenta con otro término de búsqueda' : 'Comienza registrando tu primer fiado' }}</p>
+    <button *ngIf="!searchQuery" class="btn-primary" (click)="openCreateModal()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Registrar Fiado
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando...</p>
+  </div>
+
+</div>
+
+<!-- ==========================================
+     CREATE CREDIT MODAL - CORREGIDO
+     ========================================== -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Nuevo Fiado</h2>
+      <button class="modal-close" (click)="closeCreateModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Customer Selection con Autocomplete -->
+      <div class="form-group full-width">
+        <label>Cliente *</label>
+        <div class="customer-selector">
+          <div class="customer-input-wrapper">
+            <input 
+              type="text" 
+              [(ngModel)]="customerSearchQuery"
+              (ngModelChange)="onCustomerSearch()"
+              (focus)="showCustomerDropdown = true"
+              (blur)="hideCustomerDropdown()"
+              class="form-input customer-search-input"
+              placeholder="Buscar o escribir nombre del cliente..."
+              autocomplete="off">
+            <svg class="search-icon-small" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          
+          <!-- Dropdown de clientes -->
+          <div class="customer-dropdown" *ngIf="showCustomerDropdown && filteredCustomers.length > 0">
+            <div 
+              *ngFor="let customer of filteredCustomers" 
+              class="customer-option"
+              (mousedown)="selectCustomer(customer)">
+              <div class="customer-option-avatar" [style.backgroundColor]="getCustomerColor(customer.id)">
+                {{ getInitials(customer.name) }}
+              </div>
+              <div class="customer-option-info">
+                <div class="customer-option-name">{{ customer.name }}</div>
+                <div class="customer-option-details" *ngIf="customer.phone || customer.email">
+                  <span *ngIf="customer.phone">📱 {{ customer.phone }}</span>
+                  <span *ngIf="customer.email">✉️ {{ customer.email }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Mensaje si no hay clientes -->
+          <div class="customer-dropdown empty" *ngIf="showCustomerDropdown && filteredCustomers.length === 0 && customerSearchQuery.trim()">
+            <p>No se encontraron clientes. Se registrará como nuevo cliente.</p>
+          </div>
+        </div>
+        <p class="form-help">Selecciona un cliente existente o escribe un nombre nuevo</p>
+      </div>
+
+      <!-- Total Amount -->
+      <div class="form-group full-width">
+        <label>Monto Total *</label>
+        <input 
+          type="number" 
+          [(ngModel)]="creditForm.total_amount" 
+          class="form-input amount-input-large"
+          min="0"
+          step="0.01"
+          placeholder="0.00"
+          required>
+      </div>
+
+      <!-- Due Date -->
+      <div class="form-group full-width">
+        <label>Fecha de Vencimiento</label>
+        <input 
+          type="date" 
+          [(ngModel)]="creditForm.due_date" 
+          [min]="getTodayDate()"
+          class="form-input date-input">
+        <p class="form-help">Deja vacío si no hay fecha límite</p>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group full-width">
+        <label>Notas</label>
+        <textarea 
+          [(ngModel)]="creditForm.notes" 
+          class="form-input" 
+          rows="3" 
+          placeholder="Motivo del fiado, detalles adicionales...">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closeCreateModal()">
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn-primary" 
+        (click)="createCredit()"
+        [disabled]="isLoading || !isCreditFormValid">
+        {{ isLoading ? 'Registrando...' : 'Registrar Fiado' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     PAYMENT MODAL
+     ========================================== -->
+<div *ngIf="showPaymentModal && selectedCredit" class="modal-overlay" (click)="closePaymentModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Registrar Abono</h2>
+      <button class="modal-close" (click)="closePaymentModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Credit Summary -->
+      <div class="credit-summary">
+        <div class="summary-row">
+          <span>Cliente:</span>
+          <strong>{{ selectedCredit.customer_name }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>Total:</span>
+          <span>{{ formatCurrency(selectedCredit.total_amount) }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Abonado:</span>
+          <span class="paid-text">{{ formatCurrency(selectedCredit.paid_amount) }}</span>
+        </div>
+        <div class="summary-row highlight">
+          <span>Restante:</span>
+          <strong class="remaining-text">{{ formatCurrency(selectedCredit.remaining_amount) }}</strong>
+        </div>
+      </div>
+
+      <!-- Payment Amount -->
+      <div class="form-group full-width">
+        <label>Monto del Abono *</label>
+        <input 
+          type="number" 
+          [(ngModel)]="paymentForm.amount" 
+          class="form-input amount-input" 
+          min="0"
+          [max]="selectedCredit.remaining_amount"
+          step="0.01"
+          placeholder="0.00"
+          required>
+        <div class="quick-amounts">
+          <button 
+            *ngFor="let percent of [25, 50, 75, 100]" 
+            class="quick-amount-btn"
+            (click)="paymentForm.amount = (selectedCredit.remaining_amount * percent / 100)">
+            {{ percent }}%
+          </button>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="form-group full-width">
+        <label>Método de Pago</label>
+        <div class="payment-method-options">
+          <label class="payment-method-option" [class.active]="paymentForm.payment_method === 'cash'">
+            <input type="radio" [(ngModel)]="paymentForm.payment_method" value="cash">
+            <span>💵 Efectivo</span>
+          </label>
+          <label class="payment-method-option" [class.active]="paymentForm.payment_method === 'transfer'">
+            <input type="radio" [(ngModel)]="paymentForm.payment_method" value="transfer">
+            <span>🏦 Transferencia</span>
+          </label>
+          <label class="payment-method-option" [class.active]="paymentForm.payment_method === 'card'">
+            <input type="radio" [(ngModel)]="paymentForm.payment_method" value="card">
+            <span>💳 Tarjeta</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group full-width">
+        <label>Notas del Abono</label>
+        <textarea 
+          [(ngModel)]="paymentForm.notes" 
+          class="form-input" 
+          rows="2" 
+          placeholder="Observaciones del pago...">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="closePaymentModal()">
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn-primary" 
+        (click)="addPayment()"
+        [disabled]="isLoading || !isPaymentFormValid">
+        {{ isLoading ? 'Registrando...' : 'Registrar Abono' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     DETAILS MODAL
+     ========================================== -->
+<div *ngIf="showDetailsModal && selectedCredit" class="modal-overlay" (click)="closeDetailsModal()">
+  <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Detalle del Fiado</h2>
+      <button class="modal-close" (click)="closeDetailsModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Credit Info -->
+      <div class="credit-details-header">
+        <div class="detail-item">
+          <span class="detail-label">Cliente:</span>
+          <span class="detail-value">{{ selectedCredit.customer_name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Fecha:</span>
+          <span class="detail-value">{{ formatDate(selectedCredit.created_at) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Vence:</span>
+          <span class="detail-value" [class.overdue-text]="isOverdue(selectedCredit)">
+            {{ selectedCredit.due_date ? formatDate(selectedCredit.due_date) : 'Sin fecha' }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Estado:</span>
+          <span class="status-badge" [class]="getStatusBadgeClass(selectedCredit.status)">
+            {{ getStatusText(selectedCredit.status) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Amounts -->
+      <div class="credit-amounts-detail">
+        <div class="amount-box">
+          <span class="amount-label">Total</span>
+          <span class="amount-value">{{ formatCurrency(selectedCredit.total_amount) }}</span>
+        </div>
+        <div class="amount-box paid">
+          <span class="amount-label">Abonado</span>
+          <span class="amount-value">{{ formatCurrency(selectedCredit.paid_amount) }}</span>
+        </div>
+        <div class="amount-box remaining">
+          <span class="amount-label">Restante</span>
+          <span class="amount-value">{{ formatCurrency(selectedCredit.remaining_amount) }}</span>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-section" *ngIf="selectedCredit.status !== 'cancelled'">
+        <div class="progress-label">
+          <span>Progreso de pago</span>
+          <span>{{ getProgressPercentage(selectedCredit) | number:'1.0-0' }}%</span>
+        </div>
+        <div class="progress-bar-large">
+          <div class="progress-fill-large" [style.width.%]="getProgressPercentage(selectedCredit)"></div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div *ngIf="selectedCredit.notes" class="credit-notes-detail">
+        <h3 class="section-title">Notas</h3>
+        <p>{{ selectedCredit.notes }}</p>
+      </div>
+
+      <!-- Payments History -->
+      <div class="payments-history">
+        <h3 class="section-title">Historial de Abonos</h3>
+        
+        <div *ngIf="creditPayments.length > 0" class="payments-list">
+          <div *ngFor="let payment of creditPayments" class="payment-item">
+            <div class="payment-icon-wrapper">
+              <span class="payment-emoji">💰</span>
+            </div>
+            <div class="payment-info">
+              <div class="payment-header">
+                <span class="payment-amount">{{ formatCurrency(payment.amount) }}</span>
+                <span class="payment-date">{{ formatDateTime(payment.created_at) }}</span>
+              </div>
+              <div class="payment-method-badge">
+                {{ payment.payment_method === 'cash' ? '💵 Efectivo' : payment.payment_method === 'transfer' ? '🏦 Transferencia' : '💳 Tarjeta' }}
+              </div>
+              <div class="payment-notes" *ngIf="payment.notes">{{ payment.notes }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="creditPayments.length === 0" class="no-payments">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p>Sin abonos registrados</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

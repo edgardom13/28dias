@@ -1,0 +1,149 @@
+<ion-content [fullscreen]="true" class="payment-page">
+  <div class="payment-layout visible">
+    
+    <!-- Lado Izquierdo: Imagen (Desktop) -->
+    <div class="payment-image-side">
+      <div class="image-wrapper">
+        <img src="assets/images/store-clerk.png" 
+             alt="28DIAS" 
+             class="bg-image">
+        <div class="image-overlay"></div>
+        <div class="image-content">
+          <div class="brand-logo">
+            <span>28dias</span>
+          </div>
+          <h2 class="brand-tagline">Pago 100% seguro</h2>
+          <p class="brand-description">Procesamos tu pago de forma segura a través de Mercado Pago. Tus datos están protegidos con encriptación SSL</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lado Derecho: Contenido -->
+    <div class="payment-form-side">
+      <div class="form-container">
+        
+        <!-- Logo Mobile -->
+        <div class="mobile-logo-section">
+          <div class="mobile-logo">
+            <div class="mobile-logo-circle">
+              <span>28dias</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Icono de seguridad -->
+        <div class="payment-icon-container">
+          <div class="payment-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Header -->
+        <div class="form-header">
+          <h1 class="form-title">Pago Seguro</h1>
+          <p class="form-subtitle">Plan Premium - $20,000 COP/mes</p>
+        </div>
+
+        <!-- Resumen del plan -->
+        <div class="summary-card">
+          <h3 class="summary-title">Resumen de tu compra</h3>
+          
+          <div class="summary-content">
+            <div class="summary-item">
+              <span>Plan:</span>
+              <strong>Premium</strong>
+            </div>
+            <div class="summary-item">
+              <span>Monto:</span>
+              <strong class="price">$20,000 COP</strong>
+            </div>
+            <div class="summary-item">
+              <span>Renovación:</span>
+              <strong>Automática mensual</strong>
+            </div>
+            
+            <div class="summary-divider"></div>
+            
+            <div class="summary-item total">
+              <span>Total a pagar:</span>
+              <strong class="total-price">$20,000 COP</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Métodos de pago disponibles -->
+        <div class="payment-methods">
+          <h4 class="methods-title">Métodos de pago disponibles:</h4>
+          <div class="methods-list">
+            <div class="method-item">
+              <div class="method-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
+              </div>
+              <span>Tarjetas de crédito y débito</span>
+            </div>
+            <div class="method-item">
+              <div class="method-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
+                </svg>
+              </div>
+              <span>PSE (Transferencia bancaria)</span>
+            </div>
+            <div class="method-item">
+              <div class="method-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+              </div>
+              <span>Efectivo (Baloto, Efecty, Surtimax)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="button-group">
+          <button type="button" class="cancel-button" (click)="goBack()">
+            Cancelar
+          </button>
+          <button type="button" class="submit-button" (click)="processPayment()" [disabled]="isLoading">
+            @if (isLoading) {
+              <ion-spinner name="crescent" class="btn-spinner"></ion-spinner>
+              <span>Procesando...</span>
+            } @else {
+              <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              <span>Pagar con Mercado Pago</span>
+            }
+          </button>
+        </div>
+
+        <!-- Seguridad -->
+        <div class="security-notice">
+          <div class="notice-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <p>Pago 100% seguro procesado por Mercado Pago. Tus datos están protegidos con encriptación SSL.</p>
+        </div>
+
+        <!-- Info adicional -->
+        <div class="additional-info">
+          <p>Al hacer clic en "Pagar", serás redirigido a la plataforma segura de Mercado Pago donde podrás completar tu pago con el método que prefieras.</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <p>© 2026 28DIAS. Todos los derechos reservados</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ion-content>

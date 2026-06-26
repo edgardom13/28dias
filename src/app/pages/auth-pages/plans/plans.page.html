@@ -1,0 +1,197 @@
+<ion-content [fullscreen]="true" class="plans-page">
+  <div class="plans-layout visible">
+    
+    <!-- Lado Izquierdo: Imagen (Desktop) -->
+    <div class="plans-image-side">
+      <div class="image-wrapper">
+        <img src="assets/images/store-clerk.png" alt="28DIAS" class="bg-image">
+        <div class="image-overlay"></div>
+        <div class="image-content">
+          <div class="brand-logo">
+            <span>28dias</span>
+          </div>
+          <h2 class="brand-tagline">Elige el plan perfecto para ti</h2>
+          <p class="brand-description">Comienza con una prueba gratuita o desbloquea todo el potencial con nuestro plan premium</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lado Derecho: Contenido -->
+    <div class="plans-form-side">
+      <div class="form-container">
+        
+        <!-- Logo Mobile -->
+        <div class="mobile-logo-section">
+          <div class="mobile-logo">
+            <div class="mobile-logo-circle">
+              <span>28dias</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Header -->
+        <div class="form-header">
+          <h1 class="form-title">Elige tu plan</h1>
+          <p class="form-subtitle">Comienza gratis o elige nuestro plan premium</p>
+        </div>
+
+        <!-- Planes en 2 columnas -->
+        <div class="plans-grid">
+          
+          <!-- Plan Gratuito -->
+          <div class="plan-card" [class.selected]="selectedPlan === 'free'" (click)="selectPlan('free')">
+            <div class="plan-badge">GRATIS</div>
+            <div class="plan-header">
+              <h3 class="plan-title">Plan Gratuito</h3>
+              <div class="plan-price">
+                <span class="price">$0</span>
+                <span class="period">/ 15 días</span>
+              </div>
+              <p class="plan-description">Prueba gratuita por 15 días</p>
+            </div>
+            
+            <ul class="plan-features">
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Tienda virtual básica</span>
+              </li>
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Hasta 50 productos</span>
+              </li>
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Soporte por email</span>
+              </li>
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Reportes básicos</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Plan Premium -->
+          <div class="plan-card popular" [class.selected]="selectedPlan === 'premium'" (click)="selectPlan('premium')">
+            <div class="plan-badge popular-badge">MÁS POPULAR</div>
+            <div class="plan-header">
+              <h3 class="plan-title">Plan Premium</h3>
+              <div class="plan-price">
+                <span class="price">$20,000</span>
+                <span class="period">COP / mes</span>
+              </div>
+              <p class="plan-description">Renovación automática mensual</p>
+            </div>
+            
+            <ul class="plan-features">
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Todo del plan gratuito</span>
+              </li>
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Productos ilimitados</span>
+              </li>
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Soporte prioritario 24/7</span>
+              </li>
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Reportes avanzados</span>
+              </li>
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Notificaciones push</span>
+              </li>
+              <li>
+                <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Integración con pagos</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Beneficios de la Tienda Virtual -->
+        <div class="benefits-section">
+          <h3 class="benefits-title">Beneficios de tu tienda virtual</h3>
+          <div class="benefits-grid">
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <h4>Tienda Online 24/7</h4>
+              <p>Tus clientes pueden comprar en cualquier momento</p>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+              </div>
+              <h4>Reportes y Analytics</h4>
+              <p>Seguimiento de ventas y comportamiento de clientes</p>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+              </div>
+              <h4>Notificaciones Push</h4>
+              <p>Mantén informados a tus clientes</p>
+            </div>
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+              </div>
+              <h4>Pago Seguro</h4>
+              <p>Integración con pasarelas de pago confiables</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón Continuar -->
+        <button type="button" class="submit-button" (click)="onContinue()" [disabled]="!selectedPlan || isLoading">
+          @if (isLoading) {
+            <ion-spinner name="crescent" class="btn-spinner"></ion-spinner>
+            <span>Creando tu tienda...</span>
+          } @else {
+            <span>Crear mi Tienda Virtual</span>
+          }
+        </button>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <p>© 2026 28DIAS. Todos los derechos reservados</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ion-content>

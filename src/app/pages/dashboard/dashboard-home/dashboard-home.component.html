@@ -1,0 +1,408 @@
+<div class="dashboard-container">
+  
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner">
+      <div class="spinner-ring"></div>
+      <div class="spinner-ring"></div>
+      <div class="spinner-ring"></div>
+    </div>
+    <p>Cargando tu negocio...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="dashboard-content">
+
+    <!-- ==========================================
+         HEADER - SALUDO PERSONALIZADO
+         ========================================== -->
+    <header class="dash-header">
+      <div class="dash-header-content">
+        <div class="dash-header-text">
+          <p class="dash-greeting">{{ getGreeting() }}</p>
+          <h1 class="dash-business-name">{{ businessName }} 👋</h1>
+        </div>
+        <div class="dash-header-date">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span>{{ today | date:'EEEE, d MMM' }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==========================================
+         HERO CARD - RESUMEN FINANCIERO DEL DÍA
+         ========================================== -->
+    <section class="hero-section">
+      <div class="hero-card">
+        <div class="hero-bg-shapes">
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
+        </div>
+        
+        <div class="hero-content">
+          <div class="hero-label">
+            <span class="hero-dot"></span>
+            Resumen de hoy
+          </div>
+          
+          <div class="hero-amount">
+            <span class="hero-currency">$</span>
+            <span class="hero-value">{{ formatNumber(stats.todaySales) }}</span>
+          </div>
+          
+          <div class="hero-meta">
+            <div class="hero-stat">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+              <span>{{ stats.todaySalesCount }} venta{{ stats.todaySalesCount !== 1 ? 's' : '' }}</span>
+            </div>
+            <div class="hero-divider"></div>
+            <div class="hero-stat">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+              </svg>
+              <span>Mes: {{ formatCurrency(stats.monthIncome) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="hero-action-btn" (click)="navigateTo('/dashboard/pos')">
+          <span>Nueva venta</span>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         BOTONES DE ACCIÓN RÁPIDA
+         ========================================== -->
+    <section class="quick-actions">
+      <div class="quick-action-btn" (click)="navigateTo('/dashboard/pos')">
+        <div class="qa-icon qa-sale">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <span class="qa-label">Vender</span>
+      </div>
+
+      <div class="quick-action-btn" (click)="navigateTo('/dashboard/credit')">
+        <div class="qa-icon qa-credit">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+        </div>
+        <span class="qa-label">Fiado</span>
+      </div>
+
+      <div class="quick-action-btn" (click)="navigateTo('/dashboard/expenses')">
+        <div class="qa-icon qa-expense">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+        </div>
+        <span class="qa-label">Gasto</span>
+      </div>
+
+      <div class="quick-action-btn" (click)="navigateTo('/dashboard/products')">
+        <div class="qa-icon qa-product">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <span class="qa-label">Producto</span>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         ALERTAS (si hay)
+         ========================================== -->
+    <section class="alerts-section" *ngIf="alerts.length > 0">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="section-icon">⚠️</span>
+          Alertas
+        </h2>
+      </div>
+      
+      <div class="alerts-list">
+        <div 
+          *ngFor="let alert of alerts" 
+          class="alert-card" 
+          [class.alert-warning]="alert.type === 'warning'"
+          [class.alert-danger]="alert.type === 'danger'"
+          [class.alert-info]="alert.type === 'info'"
+          (click)="navigateTo(alert.link || '')">
+          <div class="alert-icon">
+            <span *ngIf="alert.type === 'warning'">⚠️</span>
+            <span *ngIf="alert.type === 'danger'">🚨</span>
+            <span *ngIf="alert.type === 'info'">ℹ️</span>
+          </div>
+          <div class="alert-content">
+            <strong>{{ alert.title }}</strong>
+            <p>{{ alert.message }}</p>
+          </div>
+          <div class="alert-action">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         KPI CARDS - INGRESOS, EGRESOS, UTILIDAD
+         ========================================== -->
+    <section class="kpi-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="section-icon">📊</span>
+          Este mes
+        </h2>
+      </div>
+
+      <div class="kpi-grid">
+        <!-- Ingresos -->
+        <div class="kpi-card kpi-income">
+          <div class="kpi-card-inner">
+            <div class="kpi-header">
+              <div class="kpi-icon-wrap">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 11l5-5m0 0l5 5m-5-5v12"/>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-body">
+              <p class="kpi-label">Ingresos</p>
+              <p class="kpi-value">{{ formatCurrency(stats.monthIncome) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Egresos -->
+        <div class="kpi-card kpi-expense">
+          <div class="kpi-card-inner">
+            <div class="kpi-header">
+              <div class="kpi-icon-wrap">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 13l-5 5m0 0l-5-5m5 5V6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-body">
+              <p class="kpi-label">Egresos</p>
+              <p class="kpi-value">{{ formatCurrency(stats.monthExpenses) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utilidad -->
+        <div class="kpi-card kpi-profit" [ngClass]="{'kpi-profit-negative': stats.monthProfit < 0}">
+          <div class="kpi-card-inner">
+            <div class="kpi-header">
+              <div class="kpi-icon-wrap">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                </svg>
+              </div>
+            </div>
+            <div class="kpi-body">
+              <p class="kpi-label">Utilidad</p>
+              <p class="kpi-value">{{ formatCurrency(stats.monthProfit) }}</p>
+              <p class="kpi-detail" [ngClass]="getProfitColor()">
+                {{ stats.monthProfit >= 0 ? '📈 Positiva' : '📉 Negativa' }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         GRÁFICO DE VENTAS
+         ========================================== -->
+    <section class="chart-section">
+      <div class="chart-card">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">Ventas de la semana</h3>
+            <p class="card-subtitle">Últimos 7 días</p>
+          </div>
+          <button class="btn-link" (click)="navigateTo('/dashboard/sales-history')">
+            Ver todo
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="sales-chart" *ngIf="salesByDay.length > 0">
+          <div class="chart-bars">
+            <div *ngFor="let day of salesByDay" class="chart-bar-wrapper">
+              <div class="chart-bar" 
+                   [style.height]="getBarHeight(day.total)"
+                   [class.has-value]="day.total > 0"
+                   [class.today]="isToday(day.date)">
+                <div class="chart-bar-tooltip">
+                  <strong>{{ formatShortDate(day.date) }}</strong>
+                  <span>{{ day.count }} venta{{ day.count !== 1 ? 's' : '' }}</span>
+                  <em>{{ formatCurrency(day.total) }}</em>
+                </div>
+              </div>
+              <div class="chart-bar-label" [class.today-label]="isToday(day.date)">
+                {{ day.date | date:'EEE' | slice:0:3 }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-chart" *ngIf="salesByDay.length === 0">
+          <div class="empty-icon">📊</div>
+          <p>Sin ventas esta semana</p>
+          <button class="empty-action" (click)="navigateTo('/dashboard/pos')">
+            Hacer mi primera venta
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TOP PRODUCTOS + RESUMEN RÁPIDO
+         ========================================== -->
+    <div class="two-col-section">
+      
+      <!-- Top Productos -->
+      <div class="top-products-card">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">🏆 Más vendidos</h3>
+            <p class="card-subtitle">Últimos 30 días</p>
+          </div>
+          <button class="btn-link" (click)="navigateTo('/dashboard/products')">
+            Ver todo
+          </button>
+        </div>
+
+        <div class="top-products-list" *ngIf="topProducts.length > 0">
+          <div *ngFor="let product of topProducts; let i = index" class="top-product-item">
+            <div class="product-rank" [class.top-1]="i === 0" [class.top-2]="i === 1" [class.top-3]="i === 2">
+              {{ i + 1 }}
+            </div>
+            <div class="product-info">
+              <div class="product-name">{{ product.product_name }}</div>
+              <div class="product-bar-container">
+                <div class="product-bar" [style.width]="getTopProductPercentage(product.quantity)"></div>
+              </div>
+              <div class="product-stats">
+                <span>{{ product.quantity }} vendidos</span>
+                <span class="product-revenue">{{ formatCurrency(product.revenue) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-chart" *ngIf="topProducts.length === 0">
+          <div class="empty-icon">🏆</div>
+          <p>Aún no hay ventas</p>
+        </div>
+      </div>
+
+      <!-- Resumen Rápido -->
+      <div class="quick-summary-card">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">📋 Mi negocio</h3>
+            <p class="card-subtitle">Estado actual</p>
+          </div>
+        </div>
+
+        <div class="summary-items">
+          <div class="summary-item" (click)="navigateTo('/dashboard/credit')">
+            <div class="summary-icon credit">💳</div>
+            <div class="summary-info">
+              <span class="summary-label">Por cobrar</span>
+              <span class="summary-value">{{ formatCurrency(stats.pendingCredits) }}</span>
+              <span class="summary-detail">{{ stats.pendingCreditsCount }} crédito{{ stats.pendingCreditsCount !== 1 ? 's' : '' }}</span>
+            </div>
+            <svg class="summary-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+
+          <div class="summary-item" (click)="navigateTo('/dashboard/inventory')">
+            <div class="summary-icon inventory">📦</div>
+            <div class="summary-info">
+              <span class="summary-label">Productos</span>
+              <span class="summary-value">{{ stats.totalProducts }}</span>
+              <span class="summary-detail" *ngIf="stats.lowStockCount > 0" class="detail-warning">
+                ⚠️ {{ stats.lowStockCount }} con stock bajo
+              </span>
+              <span class="summary-detail" *ngIf="stats.lowStockCount === 0" class="detail-success">
+                ✅ Todo en orden
+              </span>
+            </div>
+            <svg class="summary-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+
+          <div class="summary-item" (click)="navigateTo('/dashboard/customers')">
+            <div class="summary-icon customers">👥</div>
+            <div class="summary-info">
+              <span class="summary-label">Clientes</span>
+              <span class="summary-value">{{ stats.totalCustomers }}</span>
+              <span class="summary-detail">Registrados</span>
+            </div>
+            <svg class="summary-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         ACTIVIDAD RECIENTE
+         ========================================== -->
+    <section class="activity-section">
+      <div class="activity-card">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">⚡ Actividad reciente</h3>
+            <p class="card-subtitle">Últimos movimientos</p>
+          </div>
+        </div>
+
+        <div class="activity-list" *ngIf="recentActivity.length > 0">
+          <div *ngFor="let activity of recentActivity" 
+               class="activity-item" 
+               [class.activity-sale]="activity.type === 'sale'"
+               [class.activity-expense]="activity.type === 'expense'">
+            <div class="activity-icon">
+              <span>{{ activity.icon }}</span>
+            </div>
+            <div class="activity-info">
+              <div class="activity-description">{{ activity.description }}</div>
+              <div class="activity-time">{{ formatTimeAgo(activity.date) }}</div>
+            </div>
+            <div class="activity-amount" [class.positive]="activity.type === 'sale'" [class.negative]="activity.type === 'expense'">
+              {{ activity.type === 'expense' ? '-' : '+' }}{{ formatCurrency(activity.amount) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="empty-activity" *ngIf="recentActivity.length === 0">
+          <div class="empty-icon">⚡</div>
+          <p>Sin actividad reciente</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

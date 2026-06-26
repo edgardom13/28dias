@@ -1,0 +1,144 @@
+<div class="page-container">
+  
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Mi Perfil</h1>
+      <p class="page-subtitle">Gestiona la información de tu negocio</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando perfil...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="profile-content">
+    
+    <!-- Tarjeta de Información del Usuario -->
+    <div class="user-info-card">
+      <div class="user-info-header">
+        <div class="user-avatar-large">
+          {{ getInitials() }}
+        </div>
+        <div class="user-details">
+          <h2 class="user-business-name">{{ profileForm.business_name || 'Mi Negocio' }}</h2>
+          <p class="user-email">{{ currentUser?.email }}</p>
+          <div class="user-badges">
+            <span class="badge badge-plan" [class.premium]="userProfile?.plan === 'premium'">
+              {{ getPlanLabel() }}
+            </span>
+                <span class="badge badge-type">
+                    {{ currentBusinessTypeIcon }}
+                    {{ currentBusinessTypeLabel }}
+                </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-stats" *ngIf="userProfile?.plan === 'free'">
+        <div class="stat-item">
+          <span class="stat-label">Días restantes</span>
+          <span class="stat-value" [class.danger]="getDaysRemaining() <= 3">
+            {{ getDaysRemaining() }} días
+          </span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="(getDaysRemaining() / 28) * 100"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de Perfil -->
+    <form (ngSubmit)="saveProfile()" class="profile-form">
+      
+      <!-- Sección: Contacto -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon green">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <div>
+            <h3>Ubicación y Contacto</h3>
+            <p>Dirección y teléfono del negocio</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input 
+              type="tel" 
+              [(ngModel)]="profileForm.phone"
+              name="phone"
+              class="form-input"
+              placeholder="+52 555 123 4567">
+          </div>
+
+          <div class="form-group">
+            <label>Código Postal</label>
+            <input 
+              type="text" 
+              [(ngModel)]="profileForm.postal_code"
+              name="postal_code"
+              class="form-input"
+              placeholder="00000"
+              maxlength="5">
+          </div>
+
+          <div class="form-group full-width">
+            <label>Dirección</label>
+            <input 
+              type="text" 
+              [(ngModel)]="profileForm.address"
+              name="address"
+              class="form-input"
+              placeholder="Calle, número, colonia">
+          </div>
+
+          <div class="form-group">
+            <label>Ciudad</label>
+            <input 
+              type="text" 
+              [(ngModel)]="profileForm.city"
+              name="city"
+              class="form-input"
+              placeholder="Ciudad">
+          </div>
+
+          <div class="form-group">
+            <label>Estado</label>
+            <input 
+              type="text" 
+              [(ngModel)]="profileForm.state"
+              name="state"
+              class="form-input"
+              placeholder="Estado">
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="loadProfile()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Restablecer
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="isSaving">
+          <ion-spinner *ngIf="isSaving" name="crescent" class="btn-spinner"></ion-spinner>
+          <svg *ngIf="!isSaving" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

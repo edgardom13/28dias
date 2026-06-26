@@ -1,37 +1,274 @@
 /*
  * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
  */
 
-/* Core CSS required for Ionic components to work properly */
-@import "@ionic/angular/css/core.css";
+// ✅ Tailwind v3
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Basic CSS for apps built with Ionic */
+// Core CSS required for Ionic components to work properly
+@import "@ionic/angular/css/core.css";
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
+// Optional CSS utils
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+// Ionic Dark Mode
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+// ============================================
+// RESET BÁSICO
+// ============================================
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+// ============================================
+// KEYFRAMES
+// ============================================
+
+@keyframes kenBurns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fab-pulse {
+  0% {
+    box-shadow: 
+      0 0 0 0 rgba(147, 51, 234, 0.7),
+      0 10px 25px -5px rgba(147, 51, 234, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 12px rgba(147, 51, 234, 0),
+      0 10px 25px -5px rgba(147, 51, 234, 0.4);
+  }
+  100% {
+    box-shadow: 
+      0 0 0 0 rgba(147, 51, 234, 0),
+      0 10px 25px -5px rgba(147, 51, 234, 0.4);
+  }
+}
+
+// ============================================
+// SWEETALERT2 - TEMA MORADO 28DIAS
+// ============================================
+
+.swal2-container {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  inset: 0 !important;
+}
+
+.swal28dias-popup,
+.swal2-popup {
+  @apply rounded-2xl p-8 px-6 shadow-2xl border-2 border-primary bg-white text-black;
+  z-index: 9999 !important;
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 500px !important;
+  box-sizing: border-box !important;
+  
+  @media (max-width: 767px) {
+    @apply w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] mx-auto p-6 px-4 rounded-xl;
+  }
+}
+
+.swal28dias-title,
+.swal2-title {
+  @apply text-2xl font-extrabold text-black mb-3 tracking-tight text-center;
+  margin: 0 !important;
+  padding: 0 !important;
+  
+  @media (min-width: 768px) {
+    @apply text-[28px];
+  }
+  
+  @media (max-width: 767px) {
+    @apply text-xl;
+  }
+}
+
+.swal28dias-html,
+.swal2-html-container {
+  @apply text-[15px] text-gray-600 leading-relaxed text-center mb-4;
+  margin: 0 !important;
+  padding: 0 !important;
+  
+  @media (max-width: 767px) {
+    @apply text-sm;
+  }
+}
+
+.swal28dias-confirm,
+.swal2-confirm {
+  @apply bg-primary text-white border-none rounded-xl px-8 py-3.5 text-base font-semibold 
+         transition-all duration-300 ease-in-out shadow-lg hover:bg-primary-hover 
+         hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 mx-2;
+  
+  @media (max-width: 767px) {
+    @apply px-6 py-3 text-[15px] w-full my-1;
+  }
+}
+
+.swal28dias-confirm-danger {
+  @apply bg-danger text-white border-none rounded-xl px-8 py-3.5 text-base font-semibold 
+         transition-all duration-300 ease-in-out shadow-lg hover:bg-danger-hover 
+         hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 mx-2;
+  
+  @media (max-width: 767px) {
+    @apply px-6 py-3 text-[15px] w-full my-1;
+  }
+}
+
+.swal28dias-cancel,
+.swal2-cancel {
+  @apply bg-transparent text-primary border-2 border-primary rounded-xl px-8 py-3 
+         text-base font-semibold transition-all duration-300 ease-in-out mx-2
+         hover:bg-primary-light hover:-translate-y-0.5 active:translate-y-0;
+  
+  @media (max-width: 767px) {
+    @apply px-6 py-3 text-[15px] w-full my-1;
+  }
+}
+
+.swal2-actions {
+  @apply flex justify-center items-center gap-3 mt-6 flex-wrap w-full;
+  margin: 24px 0 0 0 !important;
+  padding: 0 !important;
+  
+  @media (max-width: 767px) {
+    @apply flex-col gap-2;
+  }
+}
+
+.swal2-backdrop-show,
+.swal2-backdrop {
+  @apply bg-black/40 backdrop-blur-sm;
+}
+
+.swal2-icon {
+  @apply mx-auto mb-4;
+  
+  @media (max-width: 767px) {
+    @apply w-[60px] h-[60px];
+  }
+}
+
+.swal28dias-toast-centered {
+  @apply bg-transparent shadow-none border-none p-0 max-w-[90vw];
+}
+
+.swal28dias-toast-centered .swal2-popup {
+  @apply bg-transparent shadow-none border-none p-0;
+}
+
+.swal28dias-toast-centered .swal2-title {
+  @apply text-base font-semibold text-slate-900 py-3 px-6 bg-white rounded-xl 
+         shadow-lg border-2 border-purple-600;
+  margin: 0 !important;
+}
+
+.dark .swal28dias-toast-centered .swal2-title,
+html.dark .swal28dias-toast-centered .swal2-title {
+  @apply text-white bg-slate-800 border-purple-600;
+}
+
+.swal28dias-toast-centered .swal2-icon {
+  @apply mr-2 w-6 h-6 text-lg;
+}
+
+.swal28dias-toast-centered .swal2-timer-progress-bar {
+  @apply bg-purple-600;
+}
+
+.swal28dias-toast,
+.swal2-popup.swal2-toast {
+  @apply rounded-xl p-3 px-4 shadow-lg border-2 border-primary bg-white max-w-[90vw];
+  
+  .dark & {
+    @apply bg-slate-800 border-purple-600;
+  }
+}
+
+.swal28dias-toast-title,
+.swal2-popup.swal2-toast .swal2-title {
+  @apply text-sm font-semibold text-slate-900;
+  
+  .dark & {
+    @apply text-white;
+  }
+}
+
+.error-message {
+  @apply text-danger text-xs mt-1 ml-1 animate-slide-in;
+  
+  small {
+    @apply block;
+  }
+}
+
+.swal28dias-centered-popup {
+  @apply rounded-2xl p-6 px-8 shadow-2xl border-2 border-purple-600 bg-white 
+         max-w-[400px] w-[90vw] mx-auto;
+  
+  .dark & {
+    @apply bg-slate-800 border-purple-600;
+  }
+}
+
+.swal28dias-centered-title {
+  @apply text-lg font-bold text-slate-900 text-center;
+  margin: 0 !important;
+  
+  .dark & {
+    @apply text-white;
+  }
+}
+
+.swal2-center {
+  @apply flex items-center justify-center;
+}

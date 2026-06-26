@@ -1,0 +1,532 @@
+// ============================================
+// CONFIRM EMAIL PAGE - MISMO ESTILO QUE LOGIN/REGISTER
+// ============================================
+
+// Variables
+$purple-50: #faf5ff;
+$purple-100: #f3e8ff;
+$purple-200: #e9d5ff;
+$purple-300: #d8b4fe;
+$purple-400: #c084fc;
+$purple-500: #a855f7;
+$purple-600: #9333ea;
+$purple-700: #7e22ce;
+$purple-800: #6b21a8;
+$purple-900: #581c87;
+
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+$yellow-50: #fefce8;
+$yellow-600: #ca8a04;
+$yellow-700: #a16207;
+
+// ==========================================
+// LAYOUT PRINCIPAL
+// ==========================================
+.confirm-email-page {
+  --background: #ffffff;
+}
+
+.confirm-email-layout {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #ffffff;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+
+// ==========================================
+// LADO IZQUIERDO: IMAGEN
+// ==========================================
+.confirm-email-image-side {
+  display: none;
+  width: 50%;
+  position: relative;
+  overflow: hidden;
+  
+  @media (min-width: 1024px) {
+    display: block;
+  }
+}
+
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg, 
+    rgba(107, 33, 168, 0.9) 0%, 
+    rgba(126, 34, 206, 0.85) 100%
+  );
+}
+
+.image-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem;
+  text-align: center;
+  color: white;
+}
+
+.brand-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  
+  span {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $purple-700;
+    letter-spacing: -0.5px;
+  }
+}
+
+.brand-tagline {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+  max-width: 400px;
+}
+
+.brand-description {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin: 0;
+  max-width: 350px;
+  line-height: 1.6;
+}
+
+// ==========================================
+// LADO DERECHO: CONTENIDO
+// ==========================================
+.confirm-email-form-side {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #ffffff;
+  
+  @media (min-width: 1024px) {
+    width: 50%;
+    padding: 3rem;
+  }
+}
+
+.form-container {
+  width: 100%;
+  max-width: 480px;
+}
+
+// ==========================================
+// LOGO MOBILE
+// ==========================================
+.mobile-logo-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  animation: slideDown 0.6s ease-out;
+  
+  @media (min-width: 1024px) {
+    display: none;
+  }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mobile-logo-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $purple-700 0%, $purple-600 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(126, 34, 206, 0.3), 0 0 0 6px rgba(126, 34, 206, 0.1);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+    animation: shimmer 3s infinite;
+  }
+  
+  span {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+// ==========================================
+// ICONO DE CORREO
+// ==========================================
+.email-icon-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.email-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $purple-100 0%, $purple-50 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $purple-600;
+  box-shadow: 0 8px 24px rgba(147, 51, 234, 0.15);
+  
+  svg {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+// ==========================================
+// HEADER
+// ==========================================
+.form-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.form-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: $gray-900;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.5px;
+}
+
+.form-subtitle {
+  font-size: 0.9375rem;
+  color: $gray-600;
+  margin: 0 0 0.5rem 0;
+}
+
+.email-display {
+  font-size: 1rem;
+  font-weight: 600;
+  color: $purple-700;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: $purple-50;
+  border-radius: 8px;
+  display: inline-block;
+  word-break: break-all;
+}
+
+// ==========================================
+// INSTRUCCIONES
+// ==========================================
+.instructions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: $gray-50;
+  border-radius: 12px;
+  border: 1px solid $gray-100;
+}
+
+.instruction-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.instruction-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $purple-600;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.instruction-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: $gray-700;
+  line-height: 1.5;
+  
+  strong {
+    color: $purple-700;
+    font-weight: 600;
+  }
+}
+
+// ==========================================
+// ADVERTENCIA SPAM
+// ==========================================
+.spam-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: $yellow-50;
+  border: 1px solid rgba(202, 138, 4, 0.2);
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  
+  .warning-icon {
+    color: $yellow-600;
+    flex-shrink: 0;
+    margin-top: 2px;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: $gray-700;
+    line-height: 1.5;
+    
+    strong {
+      color: $yellow-700;
+      font-weight: 600;
+    }
+  }
+}
+
+// ==========================================
+// BOTONES DE ACCIÓN
+// ==========================================
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: $purple-700;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  
+  &:hover {
+    background: $purple-800;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(126, 34, 206, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.resend-button {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: white;
+  color: $purple-700;
+  border: 1.5px solid $purple-200;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  
+  &:hover:not(:disabled) {
+    background: $purple-50;
+    border-color: $purple-300;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .btn-spinner {
+    --color: #7e22ce;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ==========================================
+// LINK DE AYUDA
+// ==========================================
+.help-section {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  
+  .help-text {
+    margin: 0;
+    font-size: 0.875rem;
+    color: $gray-600;
+  }
+  
+  .help-link {
+    color: $purple-700;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: $purple-800;
+      text-decoration: underline;
+    }
+  }
+}
+
+// ==========================================
+// FOOTER
+// ==========================================
+.form-footer {
+  text-align: center;
+  
+  p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: $gray-500;
+  }
+}
+
+// ==========================================
+// RESPONSIVE
+// ==========================================
+@media (max-width: 640px) {
+  .confirm-email-form-side {
+    padding: 1.5rem;
+  }
+  
+  .form-title {
+    font-size: 1.5rem;
+  }
+  
+  .form-subtitle {
+    font-size: 0.875rem;
+  }
+  
+  .email-display {
+    font-size: 0.875rem;
+    padding: 0.4rem 0.875rem;
+  }
+  
+  .instructions-section {
+    padding: 1.25rem;
+    gap: 0.875rem;
+  }
+  
+  .instruction-number {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8125rem;
+  }
+  
+  .instruction-text {
+    font-size: 0.875rem;
+  }
+  
+  .spam-warning {
+    padding: 0.875rem;
+    
+    p {
+      font-size: 0.8125rem;
+    }
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .brand-tagline {
+    font-size: 1.75rem;
+  }
+  
+  .brand-description {
+    font-size: 0.9375rem;
+  }
+}
+
+// ==========================================
+// REDUCED MOTION
+// ==========================================
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .confirm-email-layout {
+    opacity: 1;
+  }
+}
